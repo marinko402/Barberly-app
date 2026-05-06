@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\User\\Desktop\\TIKS projekat\\barberly\\app\\tests-playwright\\tests-playwright.csproj": {}
+    "C:\\Users\\User\\Desktop\\TIKS projekat\\Barberly\\app\\tests-playwright\\tests-playwright.csproj": {}
   },
   "projects": {
-    "C:\\Users\\User\\Desktop\\TIKS projekat\\barberly\\app\\tests-playwright\\tests-playwright.csproj": {
+    "C:\\Users\\User\\Desktop\\TIKS projekat\\Barberly\\app\\tests-playwright\\tests-playwright.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\User\\Desktop\\TIKS projekat\\barberly\\app\\tests-playwright\\tests-playwright.csproj",
+        "projectUniqueName": "C:\\Users\\User\\Desktop\\TIKS projekat\\Barberly\\app\\tests-playwright\\tests-playwright.csproj",
         "projectName": "tests-playwright",
-        "projectPath": "C:\\Users\\User\\Desktop\\TIKS projekat\\barberly\\app\\tests-playwright\\tests-playwright.csproj",
+        "projectPath": "C:\\Users\\User\\Desktop\\TIKS projekat\\Barberly\\app\\tests-playwright\\tests-playwright.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\User\\Desktop\\TIKS projekat\\barberly\\app\\tests-playwright\\obj\\",
+        "outputPath": "C:\\Users\\User\\Desktop\\TIKS projekat\\Barberly\\app\\tests-playwright\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
