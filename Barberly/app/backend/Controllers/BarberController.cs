@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.Dtos;
 using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,15 +33,24 @@ public class BarberController : ControllerBase
     }
 
     [HttpPost("CreateBarber")]
-    public async Task<ActionResult<Barber>> CreateBarber([FromBody] Barber barber)
+    public async Task<ActionResult<Barber>> CreateBarber([FromBody] BarberDto barberDto)
     {
+        var barber = new Barber
+        {
+            barberId = Guid.NewGuid(),
+            firstName = barberDto.firstName,
+            lastName = barberDto.lastName,
+            email = barberDto.email,
+        };
+
         context.Barbers.Add(barber);
         await context.SaveChangesAsync();
+
         return Ok(barber);
     }
 
     [HttpPut("UpdateBarber/{id}")]
-    public async Task<IActionResult> UpdateBarber(Guid id, [FromBody] Barber barber)
+    public async Task<IActionResult> UpdateBarber(Guid id, [FromBody] BarberDto barber)
     {
         var existing = await context.Barbers.FindAsync(id);
         if (existing == null)

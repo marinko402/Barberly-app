@@ -12,4 +12,5 @@ public class Timeslot
 
     public Salon? salon { get; set; }
     public Barber? barber { get; set; }
+    public bool isBooked { get; set; }
 }

@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.Dtos;
 using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,23 +23,53 @@ public class BookingController : ControllerBase
         return await context.Bookings.Include(b => b.timeslot).ToListAsync();
     }
 
-    [HttpPost]
-    public async Task<ActionResult<Booking>> Create([FromBody] Booking booking)
+    [HttpPost("CreateBooking")]
+    public async Task<ActionResult<Booking>> CreateBooking([FromBody] BookingDto bookingDto)
     {
+        var timeslot = await context.Timeslots.FirstOrDefaultAsync(t =>
+            t.timeslotId == bookingDto.timeslotId
+        );
+
+        if (timeslot == null)
+            return NotFound("Termin ne postoji.");
+        if (timeslot.isBooked)
+            return BadRequest("Termin je već zauzet.");
+
+        Booking booking = new Booking
+        {
+            timeslot = timeslot,
+            customerFirstName = bookingDto.customerFirstName,
+            customerLastName = bookingDto.customerLastName,
+            customerEmail = bookingDto.customerEmail,
+            customerPhoneNumber = bookingDto.customerPhoneNumber,
+        };
+
+        timeslot.isBooked = true;
+
         context.Bookings.Add(booking);
         await context.SaveChangesAsync();
+
         return Ok(booking);
     }
 
     [HttpDelete("DeleteBooking/{id}")]
     public async Task<IActionResult> DeleteBooking(Guid id)
     {
-        var booking = await context.Bookings.FindAsync(id);
+        var booking = await context
+            .Bookings.Include(b => b.timeslot)
+            .FirstOrDefaultAsync(b => b.bookingId == id);
+
         if (booking == null)
             return NotFound();
 
+        if (booking.timeslot != null)
+        {
+            booking.timeslot.isBooked = false;
+        }
+
         context.Bookings.Remove(booking);
         await context.SaveChangesAsync();
+
         return NoContent();
     }
 }

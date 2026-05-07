@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.Dtos;
 using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,15 +36,16 @@ public class SalonController : ControllerBase
     }
 
     [HttpPost("CreateSalon")]
-    public async Task<ActionResult<Salon>> CreateSalon([FromBody] Salon salon)
+    public async Task<ActionResult<Salon>> CreateSalon([FromBody] SalonDto dto)
     {
+        Salon salon = new Salon { name = dto.name, address = dto.address };
         context.Salons.Add(salon);
         await context.SaveChangesAsync();
         return Ok(salon);
     }
 
     [HttpPut("UpdateSalon/{id}")]
-    public async Task<IActionResult> UpdateSalon(Guid id, [FromBody] Salon salon)
+    public async Task<IActionResult> UpdateSalon(Guid id, [FromBody] SalonDto salon)
     {
         var existing = await context.Salons.FindAsync(id);
         if (existing == null)
@@ -66,5 +68,23 @@ public class SalonController : ControllerBase
         context.Salons.Remove(salon);
         await context.SaveChangesAsync();
         return NoContent();
+    }
+
+    [HttpPut("AddBarberToSalon")]
+    public async Task<IActionResult> AddBarberToSalon(Guid barberId, Guid salonId)
+    {
+        var barber = await context.Barbers.FindAsync(barberId);
+        if (barber == null)
+            return NotFound("Barber ne postoji.");
+
+        var salon = await context.Salons.FindAsync(salonId);
+        if (salon == null)
+            return NotFound("Salon ne postoji.");
+
+        salon.barbers.Add(barber);
+
+        await context.SaveChangesAsync();
+
+        return Ok("Barber uspešno dodat u salon.");
     }
 }
