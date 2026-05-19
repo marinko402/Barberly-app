@@ -160,3 +160,5 @@ C:\Users\User\Desktop\TIKS projekat\Barberly\app\backend\bin\Debug\net10.0\zh-Ha
 C:\Users\User\Desktop\TIKS projekat\Barberly\app\backend\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\User\Desktop\TIKS projekat\Barberly\app\backend\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\User\Desktop\TIKS projekat\Barberly\app\backend\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\User\Desktop\TIKS projekat\Barberly\app\backend\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\User\Desktop\TIKS projekat\Barberly\app\backend\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll

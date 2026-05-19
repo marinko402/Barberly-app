@@ -37,10 +37,10 @@ public class BarberController : ControllerBase
     {
         var barber = new Barber
         {
-            barberId = Guid.NewGuid(),
+            //barberId = Guid.NewGuid(),
             firstName = barberDto.firstName,
             lastName = barberDto.lastName,
-            email = barberDto.email,
+            Email = barberDto.email,
         };
 
         context.Barbers.Add(barber);
@@ -58,8 +58,8 @@ public class BarberController : ControllerBase
 
         existing.firstName = barber.firstName;
         existing.lastName = barber.lastName;
-        existing.email = barber.email;
-        existing.phoneNumber = barber.phoneNumber;
+        existing.Email = barber.email;
+        existing.PhoneNumber = barber.phoneNumber;
 
         await context.SaveChangesAsync();
         return NoContent();

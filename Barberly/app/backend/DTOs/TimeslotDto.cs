@@ -9,6 +9,6 @@ public class TimeslotDto
     public int duration { get; set; }
 
     public Guid salonId { get; set; }
-    public Guid barberId { get; set; }
+    public string? barberId { get; set; }
     public bool isBooked { get; set; }
 }

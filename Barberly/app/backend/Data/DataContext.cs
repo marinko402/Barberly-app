@@ -1,9 +1,11 @@
 using backend.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Data;
 
-public class DataContext : DbContext
+public class DataContext : IdentityDbContext<Barber, IdentityRole, string>
 {
     public DbSet<Barber> Barbers { get; set; }
     public DbSet<Booking> Bookings { get; set; }
@@ -13,5 +15,10 @@ public class DataContext : DbContext
     public DataContext(DbContextOptions<DataContext> options)
         : base(options) { }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder) { }
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.Ignore<IdentityPasskeyData>();
+    }
 }

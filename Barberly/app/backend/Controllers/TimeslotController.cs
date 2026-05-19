@@ -43,9 +43,7 @@ public class TimeslotController : ControllerBase
             duration = dto.duration,
             isBooked = false,
         };
-        var barber = await context
-            .Barbers.Where(b => b.barberId == dto.barberId)
-            .FirstOrDefaultAsync();
+        var barber = await context.Barbers.Where(b => b.Id == dto.barberId).FirstOrDefaultAsync();
 
         var salon = await context.Salons.Where(s => s.salonId == dto.salonId).FirstOrDefaultAsync();
 
@@ -61,7 +59,7 @@ public class TimeslotController : ControllerBase
         var overlapping = await context
             .Timeslots.Where(t =>
                 t.date == timeslot.date
-                && t.barber!.barberId == timeslot.barber.barberId
+                && t.barber!.Id == timeslot.barber.Id
                 && t.startTime < newEnd
                 && newStart < t.startTime.AddMinutes(t.duration)
             )
@@ -84,7 +82,7 @@ public class TimeslotController : ControllerBase
             return NotFound();
 
         var barber = await context
-            .Barbers.Where(b => b.barberId == timeslot.barberId)
+            .Barbers.Where(b => b.Id == timeslot.barberId)
             .FirstOrDefaultAsync();
 
         if (barber == null)
@@ -97,7 +95,7 @@ public class TimeslotController : ControllerBase
             .Timeslots.Where(t =>
                 t.timeslotId != id
                 && t.date == timeslot.date
-                && t.barber!.barberId == timeslot.barberId
+                && t.barber!.Id == timeslot.barberId
                 && t.startTime < newEnd
                 && newStart < t.startTime.AddMinutes(t.duration)
             )
