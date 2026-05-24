@@ -41,7 +41,7 @@ public class AuthController : ControllerBase
             UserName = dto.UserName,
             Email = dto.Email,
             PhoneNumber = dto.PhoneNumber,
-
+            BirthDate = dto.BirthDate,
             firstName = dto.FirstName,
             lastName = dto.LastName,
         };

@@ -1,6 +1,6 @@
 import { RouterProvider } from "react-router-dom";
 import { router } from "./routes/router";
-import {  useState } from "react";
+import { useState } from "react";
 import { ThemeProvider } from "./context/theme/theme-provider";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 

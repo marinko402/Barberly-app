@@ -107,7 +107,7 @@ export const AuthProvider: FC<Props> = ({ children }) => {
   const registerUser = async (user: User) => {
     try {
       await register(user);
-      await loginUser({ username: user.userName, password: user.password });
+      // await loginUser({ username: user.userName, password: user.password });
     } catch (e) {
       console.log(e);
       throw e;
