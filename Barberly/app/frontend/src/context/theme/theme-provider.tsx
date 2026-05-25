@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
-import {
-  ThemeProviderContext,
-  type Theme,
-} from "./theme-context";
+import { ThemeProviderContext, type Theme } from "./theme-context";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -18,7 +15,7 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
   );
 
   useEffect(() => {
@@ -39,7 +36,15 @@ export function ThemeProvider({
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
-      <ToastContainer theme={theme} />
+      <ToastContainer
+        theme="dark"
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
       {children}
     </ThemeProviderContext.Provider>
   );

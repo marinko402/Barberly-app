@@ -1,8 +1,53 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 @import "tailwindcss";
 @plugin "daisyui";
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+.Toastify__toast-body {
+  font-family:
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 0.875rem !important; /* text-sm */
+  font-weight: 500 !important; /* font-medium */
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.Toastify__toast-container .Toastify__toast {
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.Toastify__toast-container .Toastify__progress-bar {
+  background: linear-gradient(90deg, #3b82f6 0%, #ef4444 100%) !important;
+  height: 3px !important;
+}
+
+.Toastify__toast-container .Toastify__progress-bar--success,
+.Toastify__toast-container .Toastify__progress-bar-theme--dark,
+.Toastify__toast-container .Toastify__progress-bar-theme--light {
+  background: linear-gradient(90deg, #3b82f6 0%, #ef4444 100%) !important;
+}
+
+.Toastify__toast-container .Toastify__progress-bar--controlled {
+  background: transparent !important;
+}
+
+.Toastify__toast-container .Toastify__close-button {
+  color: rgba(255, 255, 255, 0.4) !important;
+  align-self: center !important;
+  opacity: 1 !important;
+}
+
+.Toastify__toast-container .Toastify__close-button:hover {
+  color: #ffffff !important;
+}
 
 @theme {
   --font-palanquin: "Palanquin", sans-serif;

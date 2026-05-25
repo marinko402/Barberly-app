@@ -156,7 +156,7 @@ const Register: FC = () => {
         firstName: data.firstName,
         lastName: data.lastName,
         userName: data.userName,
-        dateOfBirth: data.birthDate.toString(),
+        dateOfBirth: data.birthDate,
         phoneNumber: data.phoneNumber,
       });
     },
@@ -267,7 +267,8 @@ const Register: FC = () => {
                 <div className="absolute inset-0 rounded-2xl bg-[linear-gradient(67deg,rgba(255,255,255,0.8)_0%,rgba(59,130,246,0.8)_25%,rgba(255,255,255,0.8)_50%,rgba(239,68,68,0.8)_75%,rgba(255,255,255,0.8)_100%)] bg-size-[200%_100%] animate-[barber_4s_linear_infinite]" />
                 <button
                   type="submit"
-                  className="relative z-10 w-full py-1 rounded-2xl bg-black/25 border border-white/20 hover:bg-black/35 text-2xl text-white transition-all cursor-pointer font-semibold tracking-wide backdrop-blur-md hover:scale-[1.01] active:scale-[0.99]"
+                  disabled={registerMutation.isPending}
+                  className="relative z-10 w-full py-1 rounded-2xl bg-black/25 border border-white/20 hover:bg-black/35 text-2xl text-white transition-all cursor-pointer font-semibold tracking-wide backdrop-blur-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Register
                 </button>

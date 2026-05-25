@@ -51,11 +51,12 @@ const Navbar: FC = () => {
   return (
     <>
       <header className="fixed z-100 text-white w-full h-23 flex">
-        <nav className="font-palanquin w-full flex justify-between items-center bg-white bg-[linear-gradient(67deg,rgba(255,255,255,0.7)_0%,rgba(255,255,255,0.7)_20%,rgba(59,130,246,0.7)_20%,rgba(59,130,246,0.7)_40%,rgba(255,255,255,0.7)_40%,rgba(255,255,255,0.7)_60%,rgba(239,68,68,0.7)_60%,rgba(239,68,68,0.7)_80%,rgba(255,255,255,0.7)_80%,rgba(255,255,255,0.7)_100%)] bg-size-[100px_60px] animate-barber border border-black dark:border-white rounded-4xl m-5">
+        <nav className="w-full flex justify-between items-center bg-white bg-[linear-gradient(67deg,rgba(255,255,255,0.7)_0%,rgba(255,255,255,0.7)_20%,rgba(59,130,246,0.7)_20%,rgba(59,130,246,0.7)_40%,rgba(255,255,255,0.7)_40%,rgba(255,255,255,0.7)_60%,rgba(239,68,68,0.7)_60%,rgba(239,68,68,0.7)_80%,rgba(255,255,255,0.7)_80%,rgba(255,255,255,0.7)_100%)] bg-size-[100px_60px] animate-barber border border-black dark:border-white rounded-4xl m-5">
           <NavLink
             to="/"
             className="ml-3 w-32 h-8 bg-cover bg-no-repeat bg-[url('assets/images/barberly.png')]"
           ></NavLink>
+
           <div className="max-lg:hidden justify-self-center">
             <ul className="flex gap-5">
               {navLinks.map(({ name, to, isSection }) => (
@@ -83,13 +84,14 @@ const Navbar: FC = () => {
               ))}
             </ul>
           </div>
-          <div className="flex gap-2">
+
+          <div className="flex gap-2 max-lg:justify-self-ends ">
             {isLoggedIn() ? (
               <NavLink
-                className="cursor-pointer text-custom-gray bg-transparent hover:bg-transparent"
+                className="bg-white/10 rounded-2xl backdrop-blur-md border border-white/20 hover:bg-white/20 p-1 justify-center items-center cursor-pointer text-black"
                 to={toNavigate}
               >
-                <CgProfile className="w-10 h-10" />
+                <CgProfile className="w-8 h-8" />
               </NavLink>
             ) : (
               <NavLink
@@ -110,7 +112,7 @@ const Navbar: FC = () => {
                 />
 
                 <svg
-                  className="swap-off h-10 w-10 fill-current text-custom-gray"
+                  className="swap-off h-10 w-10 fill-current bg-white/10 rounded-2xl backdrop-blur-md border border-white/20 hover:bg-white/20 p-1 justify-center items-center cursor-pointer text-black"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                 >
@@ -118,7 +120,7 @@ const Navbar: FC = () => {
                 </svg>
 
                 <svg
-                  className="swap-on h-10 w-10 fill-current text-custom-gray"
+                  className="swap-on h-10 w-10 fill-current bg-white/10 rounded-2xl backdrop-blur-md border border-white/20 hover:bg-white/20 p-1 justify-center items-center cursor-pointer text-black"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                 >
@@ -126,13 +128,15 @@ const Navbar: FC = () => {
                 </svg>
               </label>
             </div>
+
+            <IoMenu
+              className="lg:hidden h-10 w-10 mr-3 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20 hover:bg-white/20 p-1 justify-center items-center cursor-pointer text-black"
+              onClick={() => {
+                toggleMenu();
+              }}
+            />
           </div>
-          <IoMenu
-            className="lg:hidden cursor-pointer text-black/80 h-13 w-13 mr-3"
-            onClick={() => {
-              toggleMenu();
-            }}
-          />
+
           {isMenuOpen && (
             <>
               <div

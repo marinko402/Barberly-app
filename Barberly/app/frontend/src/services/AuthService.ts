@@ -12,7 +12,7 @@ const register = async (user: User) => {
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
-      dateOfBirth: user.dateOfBirth,
+      birthDate: user.dateOfBirth,
     });
     return data;
   } catch (e) {
@@ -67,40 +67,50 @@ export const updateUser = async (user: User) => {
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
-      dateOfBirth: user.dateOfBirth,
+      birthDate: user.dateOfBirth,
     });
-    return response;
+    return response.data;
   } catch (e) {
-    if (axios.isAxiosError(e) && e.response) {
-      const message = e.response.data?.message || `Update failed`;
-      toast.error(message);
-      console.log(e);
-    } else {
-      toast.error("An unexpected error occurred during update.");
-      console.log(e);
-      throw e;
-    }
+    throw e;
   }
 };
-
 
 export const forgotPassword = async (email: string) => {
   const response = await apiClient.post("api/Auth/ForgotPassword", { email });
   return response.data;
 };
 
-export const resetPassword = async (email: string, token: string, newPassword: string) => {
-  const response = await apiClient.post("api/Auth/ResetPassword", { email, token, newPassword });
+export const resetPassword = async (
+  email: string,
+  token: string,
+  newPassword: string,
+) => {
+  const response = await apiClient.post("api/Auth/ResetPassword", {
+    email,
+    token,
+    newPassword,
+  });
   return response.data;
 };
 
 export const verifyPassword = async (userId: string, oldPassword: string) => {
-  const response = await apiClient.post("api/Auth/VerifyPassword", { userId, oldPassword });
+  const response = await apiClient.post("api/Auth/VerifyPassword", {
+    userId,
+    oldPassword,
+  });
   return response.data;
 };
 
-export const changePassword = async (userId: string, oldPassword: string, newPassword: string) => {
-  const response = await apiClient.post("api/Auth/ChangePassword", { userId, oldPassword, newPassword });
+export const changePassword = async (
+  userId: string,
+  oldPassword: string,
+  newPassword: string,
+) => {
+  const response = await apiClient.post("api/Auth/ChangePassword", {
+    userId,
+    oldPassword,
+    newPassword,
+  });
   return response.data;
 };
 

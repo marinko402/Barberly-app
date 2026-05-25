@@ -10,6 +10,7 @@ type AuthContextType = {
   isLoggedIn: () => boolean;
   role: string;
   id: string;
+  updateUserContext: (updatedUser: User) => void;
 };
 
 export const AuthContext = createContext<AuthContextType>(

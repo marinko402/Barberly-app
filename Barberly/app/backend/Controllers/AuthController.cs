@@ -41,10 +41,20 @@ public class AuthController : ControllerBase
             UserName = dto.UserName,
             Email = dto.Email,
             PhoneNumber = dto.PhoneNumber,
-            BirthDate = dto.BirthDate,
             firstName = dto.FirstName,
             lastName = dto.LastName,
         };
+        if (!string.IsNullOrEmpty(dto.BirthDate))
+        {
+            if (DateOnly.TryParse(dto.BirthDate, out var parsedDate))
+            {
+                user.BirthDate = parsedDate;
+            }
+            else
+            {
+                return BadRequest(new { message = "Invalid birth date format. Use YYYY-MM-DD." });
+            }
+        }
 
         var result = await _userManager.CreateAsync(user, dto.Password);
         if (!result.Succeeded)
@@ -100,23 +110,58 @@ public class AuthController : ControllerBase
     }
 
     [HttpPut("UpdateUser")]
-    public async Task<IActionResult> UpdateUser([FromBody] Barber updatedUser)
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto updatedUser)
     {
         var user = await _userManager.FindByIdAsync(updatedUser.Id);
         if (user == null)
-            return NotFound($"User with Id {updatedUser.Id} not found");
+            return NotFound(new { message = $"User with Id {updatedUser.Id} not found" });
 
-        user.firstName = updatedUser.firstName;
-        user.lastName = updatedUser.lastName;
+        if (!string.Equals(user.UserName, updatedUser.UserName, StringComparison.OrdinalIgnoreCase))
+        {
+            var userWithSameName = await _userManager.FindByNameAsync(updatedUser.UserName!);
+            if (userWithSameName != null && userWithSameName.Id != user.Id)
+            {
+                return BadRequest(new { message = "Username already exists" });
+            }
+        }
+
+        if (!string.Equals(user.Email, updatedUser.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            var userWithSameEmail = await _userManager.FindByEmailAsync(updatedUser.Email!);
+            if (userWithSameEmail != null && userWithSameEmail.Id != user.Id)
+            {
+                return BadRequest(new { message = "Email already exists" });
+            }
+        }
+
+        user.firstName = updatedUser.FirstName;
+        user.lastName = updatedUser.LastName;
         user.Email = updatedUser.Email;
         user.UserName = updatedUser.UserName;
         user.PhoneNumber = updatedUser.PhoneNumber;
+
+        if (!string.IsNullOrEmpty(updatedUser.BirthDate))
+        {
+            if (DateOnly.TryParse(updatedUser.BirthDate, out var parsedDate))
+            {
+                user.BirthDate = parsedDate;
+            }
+            else
+            {
+                return BadRequest(new { message = "Invalid birth date format. Use YYYY-MM-DD." });
+            }
+        }
+
+        if (user.UserName != null)
+            user.NormalizedUserName = _userManager.NormalizeName(user.UserName);
+        if (user.Email != null)
+            user.NormalizedEmail = _userManager.NormalizeEmail(user.Email);
 
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded)
             return BadRequest(result.Errors);
 
-        return Ok($"Admin with Id {user.Id} updated successfully");
+        return Ok(user);
     }
 
     private string GenerateJwtToken(Barber user, IList<string> roles)

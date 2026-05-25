@@ -139,13 +139,24 @@ export const AuthProvider: FC<Props> = ({ children }) => {
           axios.defaults.headers.common["Authorization"] =
             `Bearer ${data.token}`;
 
-          let userData: User = {} as User;
+          let userData;
           userData = await getUserData(id);
 
           console.log("USER DATA", userData);
 
-          localStorage.setItem("user", JSON.stringify(userData));
-          setUser(userData);
+          const storageData: User = {
+            id: userData.id,
+            userName: userData.userName,
+            email: userData.email,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            phoneNumber: userData.phoneNumber,
+            dateOfBirth: userData.birthDate,
+            password: "placeholder",
+          };
+
+          localStorage.setItem("user", JSON.stringify(storageData));
+          setUser(storageData);
 
           setIsReady(true);
 
@@ -165,6 +176,11 @@ export const AuthProvider: FC<Props> = ({ children }) => {
     return !!localStorage.getItem("token");
   };
 
+  const updateUserContext = useCallback((updatedUser: User) => {
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -176,6 +192,7 @@ export const AuthProvider: FC<Props> = ({ children }) => {
         isLoggedIn,
         role,
         id,
+        updateUserContext,
       }}
     >
       {isReady ? children : null}
