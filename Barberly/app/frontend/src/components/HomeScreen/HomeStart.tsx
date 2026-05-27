@@ -1,7 +1,10 @@
 import type { FC } from "react";
 import logo from "../../assets/images/barberly logo 2.png";
+import { useNavigate } from "react-router";
 
 const HomeStart: FC = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="h-screen justify-center items-center flex flex-col overflow-hidden bg-barber-shop bg-no-repeat bg-cover bg-center text-white">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] z-0" />
@@ -17,7 +20,10 @@ const HomeStart: FC = () => {
 
           <div className="relative inline-block rounded-2xl p-0.75 overflow-hidden mt-4 group">
             <div className="absolute inset-0 rounded-2xl bg-[linear-gradient(67deg,rgba(255,255,255,0.8)_0%,rgba(59,130,246,0.8)_25%,rgba(255,255,255,0.8)_50%,rgba(239,68,68,0.8)_75%,rgba(255,255,255,0.8)_100%)] bg-size-[200%_100%] animate-[barber_4s_linear_infinite]" />
-            <button className="relative z-10 w-80 h-15 text-2xl max-sm:text-[1rem] max-sm:w-45 max-sm:h-10 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold tracking-wide backdrop-blur-md hover:cursor-pointer hover:scale-[1.02] active:scale-[0.98]">
+            <button
+              className="relative z-10 w-80 h-15 text-2xl max-sm:text-[1rem] max-sm:w-45 max-sm:h-10 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold tracking-wide backdrop-blur-md hover:cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+              onClick={() => navigate("/barbers")}
+            >
               Find Barber
             </button>
           </div>
@@ -41,7 +47,10 @@ const HomeStart: FC = () => {
 
           <div className="relative inline-block rounded-2xl p-0.75 overflow-hidden mt-4 group">
             <div className="absolute inset-0 rounded-2xl bg-[linear-gradient(67deg,rgba(255,255,255,0.8)_0%,rgba(59,130,246,0.8)_25%,rgba(255,255,255,0.8)_50%,rgba(239,68,68,0.8)_75%,rgba(255,255,255,0.8)_100%)] bg-size-[200%_100%] animate-[barber_4s_linear_infinite]" />
-            <button className="relative z-10 w-80 h-15 text-2xl max-sm:text-[1rem] max-sm:w-45 max-sm:h-10 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold tracking-wide backdrop-blur-md hover:cursor-pointer hover:scale-[1.02] active:scale-[0.98]">
+            <button
+              className="relative z-10 w-80 h-15 text-2xl max-sm:text-[1rem] max-sm:w-45 max-sm:h-10 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-semibold tracking-wide backdrop-blur-md hover:cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+              onClick={() => navigate("/register")}
+            >
               Join as Barber
             </button>
           </div>

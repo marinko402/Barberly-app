@@ -45,6 +45,7 @@ public class BookingController : ControllerBase
         };
 
         timeslot.isBooked = true;
+        context.Timeslots.Update(timeslot);
 
         context.Bookings.Add(booking);
         await context.SaveChangesAsync();
@@ -71,5 +72,12 @@ public class BookingController : ControllerBase
         await context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    [HttpGet("GetTotalBookingsCount")]
+    public async Task<ActionResult<int>> GetTotalBookingsCount()
+    {
+        var count = await context.Bookings.CountAsync();
+        return Ok(count);
     }
 }

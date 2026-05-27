@@ -192,4 +192,63 @@ public class AuthController : ControllerBase
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    [HttpPost("CheckPassword")]
+    public async Task<IActionResult> CheckPassword([FromBody] CheckPasswordDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(dto.UserId);
+        if (user == null)
+        {
+            return NotFound(new { message = $"User with Id {dto.UserId} not found" });
+        }
+
+        var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+        if (!isPasswordValid)
+        {
+            return BadRequest(new { message = "Incorrect password" });
+        }
+
+        return Ok(new { message = "Password is correct" });
+    }
+
+    [HttpPost("ChangePassword")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(dto.UserId);
+        if (user == null)
+        {
+            return NotFound(new { message = $"User with Id {dto.UserId} not found" });
+        }
+
+        var result = await _userManager.ChangePasswordAsync(
+            user,
+            dto.CurrentPassword,
+            dto.NewPassword
+        );
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        return Ok(new { message = "Password changed successfully" });
+    }
+
+    [HttpGet("GetByUsername/{username}")]
+    public async Task<ActionResult<Barber>> GetByUsername(string username)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            return BadRequest(new { message = "Username cannot be empty." });
+        }
+
+        var user = await _userManager.FindByNameAsync(username);
+
+        if (user == null)
+        {
+            return NotFound(new { message = $"Barber with username @{username} does not exist." });
+        }
+
+        return Ok(user);
+    }
 }

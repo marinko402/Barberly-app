@@ -152,6 +152,7 @@ export const AuthProvider: FC<Props> = ({ children }) => {
             lastName: userData.lastName,
             phoneNumber: userData.phoneNumber,
             dateOfBirth: userData.birthDate,
+            salonId: userData.salonId,
             password: "placeholder",
           };
 

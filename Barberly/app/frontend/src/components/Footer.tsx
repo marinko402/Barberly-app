@@ -24,7 +24,7 @@ const Footer: FC = () => {
   };
 
   return (
-    <footer className="w-full h-fit p-5 pt-12 sm:pt-16 dark:bg-custom-gray border-t border-black/5 dark:border-white/5 overflow-hidden transition-colors duration-300">
+    <footer className="w-full h-fit p-5 pt-12 sm:pt-16 bg-neutral-100 dark:bg-custom-gray border-t border-black/5 dark:border-white/5 overflow-hidden transition-colors duration-300">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto px-4 sm:px-10 text-center sm:text-left">
         <div className="flex flex-col items-center sm:items-start min-w-50">
           <h1 className="font-extrabold text-2xl tracking-tight">Contact us</h1>
@@ -64,14 +64,11 @@ const Footer: FC = () => {
         <div className="flex flex-col items-center sm:items-start min-w-37.5">
           <h1 className="font-extrabold text-2xl tracking-tight">Services</h1>
           <ul className="flex gap-3 flex-col pt-4 text-sm sm:text-base list-none">
-            {serviceLinks.map(({ name, to }, index) => (
+            {serviceLinks.map(({ name }, index) => (
               <li key={index}>
-                <a
-                  href={to}
-                  className="text-black/50 hover:text-black dark:text-white/50 hover:dark:text-white transition-colors"
-                >
+                <p className="text-black/50 hover:text-black dark:text-white/50 hover:dark:text-white transition-colors">
                   {name}
-                </a>
+                </p>
               </li>
             ))}
           </ul>

@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import apiClient from "./client";
 
-const register = async (user: User) => {
+export const register = async (user: User) => {
   try {
     const data = await apiClient.post("api/Auth/Register", {
       userName: user.userName,
@@ -28,7 +28,7 @@ const register = async (user: User) => {
   }
 };
 
-const login = async (user: LoginUser) => {
+export const login = async (user: LoginUser) => {
   try {
     const data = await apiClient.post("api/Auth/Login", {
       userName: user.username,
@@ -48,7 +48,7 @@ const login = async (user: LoginUser) => {
   }
 };
 
-const getUserData = async (id: string) => {
+export const getUserData = async (id: string) => {
   try {
     const res = await apiClient.get(`api/Auth/GetUserData/${id}`);
     return res.data;
@@ -75,30 +75,19 @@ export const updateUser = async (user: User) => {
   }
 };
 
-export const forgotPassword = async (email: string) => {
-  const response = await apiClient.post("api/Auth/ForgotPassword", { email });
-  return response.data;
-};
-
-export const resetPassword = async (
-  email: string,
-  token: string,
-  newPassword: string,
+export const verifyPassword = async (
+  userId: string,
+  passwordToCheck: string,
 ) => {
-  const response = await apiClient.post("api/Auth/ResetPassword", {
-    email,
-    token,
-    newPassword,
-  });
-  return response.data;
-};
-
-export const verifyPassword = async (userId: string, oldPassword: string) => {
-  const response = await apiClient.post("api/Auth/VerifyPassword", {
-    userId,
-    oldPassword,
-  });
-  return response.data;
+  try {
+    const response = await apiClient.post("api/Auth/CheckPassword", {
+      userId,
+      password: passwordToCheck,
+    });
+    return response.data;
+  } catch (e) {
+    throw e;
+  }
 };
 
 export const changePassword = async (
@@ -106,12 +95,15 @@ export const changePassword = async (
   oldPassword: string,
   newPassword: string,
 ) => {
-  const response = await apiClient.post("api/Auth/ChangePassword", {
-    userId,
-    oldPassword,
-    newPassword,
-  });
-  return response.data;
+  try {
+    const response = await apiClient.post("api/Auth/ChangePassword", {
+      userId,
+      currentPassword: oldPassword,
+      newPassword: newPassword,
+    });
+    toast.success("Password changed successfully!");
+    return response.data;
+  } catch (e) {
+    throw e;
+  }
 };
-
-export { register, login, getUserData };

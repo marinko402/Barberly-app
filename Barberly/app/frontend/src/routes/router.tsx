@@ -7,6 +7,8 @@ import Register from "../pages/Register";
 import Profile from "../pages/Profile";
 import { ProtectedLoader } from "./ProtectedLoader";
 import Barber from "../pages/Barber";
+import { LoginLoader } from "./LoginLoader";
+import Salon from "../pages/Salon";
 
 export const router = createBrowserRouter([
   {
@@ -19,10 +21,12 @@ export const router = createBrowserRouter([
       {
         path: "login",
         element: <Login />,
+        loader: LoginLoader,
       },
       {
         path: "register",
         element: <Register />,
+        loader: LoginLoader,
       },
       {
         path: "barbers",
@@ -32,6 +36,10 @@ export const router = createBrowserRouter([
         path: "profile",
         element: <Profile />,
         loader: ProtectedLoader,
+      },
+      {
+        path: "salon/:name",
+        element: <Salon />,
       },
       {
         path: "*",

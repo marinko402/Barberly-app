@@ -20,5 +20,19 @@ public class DataContext : IdentityDbContext<Barber, IdentityRole, string>
         base.OnModelCreating(builder);
 
         builder.Ignore<IdentityPasskeyData>();
+
+        builder
+            .Entity<Barber>()
+            .HasOne(b => b.salon)
+            .WithMany(s => s.barbers)
+            .HasForeignKey(b => b.SalonId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder
+            .Entity<Salon>()
+            .HasOne(s => s.owner)
+            .WithMany()
+            .HasForeignKey(s => s.OwnerId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

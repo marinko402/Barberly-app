@@ -6,7 +6,7 @@ const AboutUs: FC = () => {
   return (
     <section
       id="about-us"
-      className="relative dark:bg-custom-gray text-slate-900py-12 sm:py-20 px-4 sm:px-16 overflow-hidden transition-colors duration-300"
+      className="relative dark:bg-custom-gray py-12 sm:py-20 px-4 sm:px-16 overflow-hidden transition-colors duration-300"
     >
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 items-center">
         <div className="space-y-4 sm:space-y-6 z-10 text-center lg:text-left">
@@ -17,7 +17,7 @@ const AboutUs: FC = () => {
 
           <h2 className="text-3xl sm:text-5xl font-bold tracking-tight">
             About{" "}
-            <span className="bg-linear-to-r from-blue-600 to-red-500 dark:from-blue-400 dark:to-red-400 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-blue-600 to-red-500 dark:from-blue-400 dark:via-white dark:to-red-400 bg-clip-text text-transparent">
               Barberly
             </span>
           </h2>
@@ -25,11 +25,9 @@ const AboutUs: FC = () => {
           <p className="text-slate-600 dark:text-gray-400 text-base sm:text-lg leading-relaxed font-light">
             We believe in the power of a great cut and the artistry that every
             barber brings to their craft.{" "}
-            <strong className="font-medium">
-              Barberly
-            </strong>{" "}
-            is more than just a platform – it is a dedicated ecosystem bridging
-            clients who value master barbers with top-tier professionals.
+            <strong className="font-medium">Barberly</strong> is more than just
+            a platform – it is a dedicated ecosystem bridging clients who value
+            master barbers with top-tier professionals.
           </p>
 
           <p className="text-slate-600 dark:text-gray-400 text-base sm:text-lg leading-relaxed font-light">
@@ -41,9 +39,7 @@ const AboutUs: FC = () => {
 
           <div className="pt-4 border-t border-slate-900/5 dark:border-white/5 flex flex-row items-center justify-around lg:justify-start lg:gap-12 gap-4">
             <div className="text-center lg:text-left">
-              <p className="text-2xl sm:text-3xl font-bold">
-                100%
-              </p>
+              <p className="text-2xl sm:text-3xl font-bold">100%</p>
               <p className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 dark:text-gray-500 mt-1">
                 Verified Barbers
               </p>

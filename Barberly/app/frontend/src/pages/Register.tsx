@@ -1,11 +1,4 @@
-import {
-  forwardRef,
-  type ElementType,
-  type FC,
-  type InputHTMLAttributes,
-  useId,
-  useState,
-} from "react";
+import { type FC } from "react";
 import barberChair from "../assets/images/barberChair.png";
 import barberlyLogo from "../assets/images/barberlyLogo3.png";
 import { z } from "zod";
@@ -16,9 +9,9 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { CgProfile } from "react-icons/cg";
 import { CiLock, CiMail, CiUser, CiPhone, CiCalendar } from "react-icons/ci";
-import { LuEye, LuEyeClosed } from "react-icons/lu";
 import { useAuth } from "../context/auth/useAuth";
 import { motion } from "framer-motion";
+import TextField from "../components/TextField";
 
 const formSchema = z
   .object({
@@ -51,80 +44,6 @@ const formSchema = z
 
 type FormInputs = z.infer<typeof formSchema>;
 
-type TextFieldProps = {
-  label: string;
-  error?: string;
-  icon: ElementType;
-  isPasswordField?: boolean;
-} & InputHTMLAttributes<HTMLInputElement>;
-
-const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
-  (
-    {
-      label,
-      error,
-      icon: Icon,
-      type = "text",
-      isPasswordField = false,
-      ...props
-    },
-    ref,
-  ) => {
-    const id = useId();
-    const [showPassword, setShowPassword] = useState(false);
-    const inputType = isPasswordField
-      ? showPassword
-        ? "text"
-        : "password"
-      : type;
-
-    return (
-      <label htmlFor={id} className="w-full block text-left text-white/80">
-        <span className="block text-white/70 font-semibold text-xs uppercase tracking-wider mb-1 pl-1">
-          {label}
-        </span>
-        <div className="relative group/input">
-          <input
-            ref={ref}
-            id={id}
-            type={inputType}
-            {...props}
-            className={`
-              w-full pl-10 ${isPasswordField ? "pr-10" : "pr-4"} py-2.5
-              bg-[#161616]/40 text-white rounded-xl border border-white/10
-              placeholder-white/25 text-sm font-medium transition-all duration-200
-              focus:outline-hidden focus:border-blue-500 focus:bg-black/40
-              hover:border-white/20
-              ${error ? "border-red-500/50 focus:border-red-500" : ""}
-            `}
-          />
-          {Icon && (
-            <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40 group-focus-within/input:text-blue-500 transition-colors pointer-events-none" />
-          )}
-          {isPasswordField && (
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/40 hover:text-white transition-colors cursor-pointer z-30 focus:outline-hidden"
-            >
-              {showPassword ? (
-                <LuEye className="h-4 w-4" />
-              ) : (
-                <LuEyeClosed className="h-4 w-4" />
-              )}
-            </button>
-          )}
-        </div>
-        {error && (
-          <span className="block text-red-400 text-[11px] font-medium mt-1 pl-1">
-            {error}
-          </span>
-        )}
-      </label>
-    );
-  },
-);
-
 const Register: FC = () => {
   const {
     register,
@@ -149,7 +68,7 @@ const Register: FC = () => {
 
   const registerMutation = useMutation({
     mutationFn: async (data: FormInputs) => {
-      registerUser({
+      await registerUser({
         id: "",
         email: data.email,
         password: data.password,
@@ -158,6 +77,7 @@ const Register: FC = () => {
         userName: data.userName,
         dateOfBirth: data.birthDate,
         phoneNumber: data.phoneNumber,
+        salonId: "",
       });
     },
     onSuccess: () => {
@@ -268,15 +188,15 @@ const Register: FC = () => {
                 <button
                   type="submit"
                   disabled={registerMutation.isPending}
-                  className="relative z-10 w-full py-1 rounded-2xl bg-black/25 border border-white/20 hover:bg-black/35 text-2xl text-white transition-all cursor-pointer font-semibold tracking-wide backdrop-blur-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="relative z-10 w-full py-2 rounded-2xl bg-black/25 border border-white/20 hover:bg-black/35 text-xl text-white transition-all cursor-pointer font-semibold tracking-wide backdrop-blur-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Register
+                  {registerMutation.isPending ? "Registering..." : "Register"}
                 </button>
               </div>
             </div>
           </form>
 
-          <div className="text-end  text-sm text-white/60 pt-2 border-t border-white/5">
+          <div className="text-end text-sm text-white/60 pt-2 border-t border-white/5">
             Already have an account?{" "}
             <Link
               to="/login"
@@ -319,7 +239,7 @@ const Register: FC = () => {
       </div>
 
       <button
-        className="cursor-pointer px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium rounded-xl absolute right-6 bottom-6 hover:scale-105 active:scale-95 transition-all shadow-md backdrop-blur-md z-20"
+        className="cursor-pointer px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium rounded-xl absolute right-6 bottom-6 hover:scale-105 active:scale-95 transition-all shadow-md backdrop-blur-md z-20 max-md:left-6 max-md:right-auto"
         onClick={() => navigate("/")}
       >
         Go home

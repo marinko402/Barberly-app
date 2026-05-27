@@ -7,6 +7,7 @@ export type User = {
   userName: string;
   dateOfBirth: string;
   phoneNumber: string;
+  salonId: string;
 };
 
 export type LoginUser = {

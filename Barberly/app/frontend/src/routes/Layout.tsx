@@ -16,7 +16,7 @@ const Layout = () => {
       <AuthProvider>
         {!hideLayout && <Navbar />}
         <AnimatePresence mode="wait">
-          <main className="w-full h-full overflow-hidden dark:bg-custom-gray dark:text-white">
+          <main className="w-full h-full overflow-hidden bg-neutral-100 dark:bg-custom-gray dark:text-white">
             <ScrollToTop />
             <Outlet />
           </main>

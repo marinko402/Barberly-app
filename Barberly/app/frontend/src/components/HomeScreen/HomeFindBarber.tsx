@@ -1,54 +1,37 @@
 import type { FC } from "react";
 import { useState, useEffect, useRef } from "react";
-import { FiMapPin, FiScissors, FiSearch, FiStar, FiX } from "react-icons/fi";
+import { FiMapPin, FiUsers, FiCalendar } from "react-icons/fi";
+import { useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getSalonsCount,
+  getTotalBookingsCount,
+  getTopSalons,
+} from "../../services/SalonService";
 
 export const HomeFindBarber: FC = () => {
-  const [currentIndex, setCurrentIndex] = useState<number>(1);
-  const [selectedService, setSelectedService] = useState<string>("");
-  const [isLocationFocused, setIsLocationFocused] = useState<boolean>(false);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const navigate = useNavigate();
 
   const sliderRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const services = ["Fade", "Beard Trim", "Hair and beard", "Hair styling"];
+  const { data: salonsCount, isLoading: loadingSalons } = useQuery<number>({
+    queryKey: ["salonsCount"],
+    queryFn: getSalonsCount,
+  });
 
-  const featuredShops = [
-    {
-      id: 1,
-      name: "Royal Cuts",
-      rating: "4.9",
-      reviews: "110",
-      location: "New York, NY",
-      image:
-        "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-      id: 2,
-      name: "The Vintage Post",
-      rating: "4.8",
-      reviews: "95",
-      location: "Brooklyn, NY",
-      image:
-        "https://images.unsplash.com/photo-1605497746444-ac9dbd324ce8?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-      id: 3,
-      name: "Masterstroke Barber",
-      rating: "5.0",
-      reviews: "142",
-      location: "Manhattan, NY",
-      image:
-        "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=600&q=80",
-    },
-  ];
+  const { data: bookingsCount, isLoading: loadingBookings } = useQuery<number>({
+    queryKey: ["bookingsCount"],
+    queryFn: getTotalBookingsCount,
+  });
 
-  const handleFilterClick = (filter: string) => {
-    if (selectedService === filter) {
-      setSelectedService("");
-    } else {
-      setSelectedService(filter);
-    }
-  };
+  const { data: topSalons = [], isLoading: loadingTopSalons } = useQuery<any[]>(
+    {
+      queryKey: ["topSalons"],
+      queryFn: getTopSalons,
+    },
+  );
 
   const scrollToContainerIndex = (index: number) => {
     const container = scrollContainerRef.current;
@@ -103,14 +86,17 @@ export const HomeFindBarber: FC = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (document.activeElement?.closest(".slider-container")) {
+      if (
+        document.activeElement?.closest(".slider-container") &&
+        topSalons.length > 0
+      ) {
         let nextIndex = currentIndex;
         if (e.key === "ArrowLeft") {
           nextIndex =
-            currentIndex === 0 ? featuredShops.length - 1 : currentIndex - 1;
+            currentIndex === 0 ? topSalons.length - 1 : currentIndex - 1;
         } else if (e.key === "ArrowRight") {
           nextIndex =
-            currentIndex === featuredShops.length - 1 ? 0 : currentIndex + 1;
+            currentIndex === topSalons.length - 1 ? 0 : currentIndex + 1;
         }
 
         if (nextIndex !== currentIndex) {
@@ -121,21 +107,28 @@ export const HomeFindBarber: FC = () => {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentIndex, featuredShops.length]);
+  }, [currentIndex, topSalons.length]);
+
+  const hasInitialScrolled = useRef(false);
 
   useEffect(() => {
-    setTimeout(() => scrollToContainerIndex(1), 100);
-  }, []);
+    if (topSalons.length > 0 && !hasInitialScrolled.current) {
+      const timer = setTimeout(() => {
+        scrollToContainerIndex(0);
+        hasInitialScrolled.current = true;
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [topSalons.length]);
 
   return (
     <section className="w-full py-20 sm:py-28 px-4 sm:px-16 text-slate-900 dark:text-white overflow-hidden transition-colors duration-300">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-      
         <div className="grid lg:col-span-5 space-y-8 w-full">
           <div className="space-y-3 text-center lg:text-left">
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
               Find Master Barbers{" "}
-              <span className="bg-linear-to-r from-blue-600 to-red-500 dark:from-blue-400 dark:to-red-400 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-blue-600 to-red-500 dark:from-blue-400 dark:via-white dark:to-red-400 bg-clip-text text-transparent">
                 Near You
               </span>
             </h2>
@@ -145,72 +138,45 @@ export const HomeFindBarber: FC = () => {
             </p>
           </div>
 
-          <div className="w-full bg-slate-50 dark:bg-white/5 border border-slate-900/5 dark:border-white/10 rounded-2xl p-3 sm:p-4 shadow-xl backdrop-blur-md">
-            <div className="flex flex-col sm:flex-row bg-white dark:bg-[#0f1115]/80 border border-slate-900/10 dark:border-white/5 rounded-xl overflow-hidden p-1 gap-1 relative">
-              <div className="flex items-center px-3 py-2 flex-1 group">
-                <FiMapPin
-                  className={`mr-2.5 h-4 w-4 shrink-0 transition-colors duration-200 ${isLocationFocused ? "text-blue-500" : "text-slate-400 dark:text-gray-500"}`}
-                />
-                <input
-                  type="text"
-                  placeholder="Location..."
-                  onFocus={() => setIsLocationFocused(true)}
-                  onBlur={() => setIsLocationFocused(false)}
-                  className="bg-transparent text-sm font-medium focus:outline-hidden text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 w-full"
-                />
-              </div>
-
-              <div className="hidden sm:block w-px bg-slate-200 dark:bg-white/10 my-2" />
-
-              <div className="flex items-center px-3 py-2 flex-1 border-t sm:border-t-0 border-slate-100 dark:border-white/5 relative select-none">
-                <FiScissors
-                  className={`mr-2.5 h-4 w-4 shrink-0 transition-colors duration-200 ${selectedService ? "text-red-500" : "text-slate-400 dark:text-gray-500"}`}
-                />
-                <div className="flex-1 text-sm font-medium text-slate-900 dark:text-white truncate pr-6">
-                  {selectedService ? (
-                    <span className="font-semibold text-blue-600 dark:text-blue-400">
-                      {selectedService}
-                    </span>
-                  ) : (
-                    <span className="text-slate-400 dark:text-gray-500 font-light">
-                      Any service (All)
-                    </span>
-                  )}
-                </div>
-                {selectedService && (
-                  <button
-                    onClick={() => setSelectedService("")}
-                    className="absolute right-3 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
-                  >
-                    <FiX className="h-3.5 w-3.5" />
-                  </button>
+          <div className="w-full bg-slate-50 dark:bg-white/5 border border-slate-900/5 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-6">
+            <div className="grid grid-cols-2 gap-4 border-b border-slate-200 dark:border-white/5 pb-4">
+              <div className="space-y-1 text-center sm:text-left">
+                {loadingSalons ? (
+                  <div className="h-9 w-16 bg-slate-200 dark:bg-white/10 rounded-lg animate-pulse mx-auto sm:mx-0" />
+                ) : (
+                  <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {salonsCount ?? 0}+
+                  </span>
                 )}
+                <p className="text-xs text-slate-400 dark:text-gray-500 uppercase tracking-wider font-bold">
+                  Premium Salons
+                </p>
               </div>
 
-              <button className="relative group rounded-lg overflow-hidden p-0.5 focus:outline-hidden cursor-pointer shrink-0 mt-2 sm:mt-0">
-                <span className="absolute inset-0 bg-linear-to-r from-blue-600 via-red-500 to-blue-600 dark:from-blue-500 dark:via-red-500 dark:to-blue-500 bg-size-[200%_auto] transition-all duration-500 opacity-0 group-hover:opacity-100 group-hover:animate-pulse" />
-                <div className="relative flex items-center justify-center gap-2 bg-slate-900 text-white dark:bg-linear-to-r dark:from-blue-600 dark:to-blue-500 sm:dark:from-transparent sm:dark:to-transparent sm:dark:bg-[#0f1115] px-5 py-2.5 sm:py-3 rounded-[6px] font-semibold text-sm transition-colors duration-300 group-hover:bg-transparent group-hover:text-white">
-                  <FiSearch className="h-4 w-4" />
-                  <span className="sm:hidden lg:inline">Search</span>
-                </div>
+              <div className="space-y-1 text-center sm:text-left border-l border-slate-200 dark:border-white/5 pl-4">
+                {loadingBookings ? (
+                  <div className="h-9 w-24 bg-slate-200 dark:bg-white/10 rounded-lg animate-pulse mx-auto sm:mx-0" />
+                ) : (
+                  <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {bookingsCount?.toLocaleString() ?? 0}+
+                  </span>
+                )}
+                <p className="text-xs text-slate-400 dark:text-gray-500 uppercase tracking-wider font-bold">
+                  Total Bookings
+                </p>
+              </div>
+            </div>
+
+            <div className="relative w-full rounded-xl p-[1.5px] overflow-hidden group/btn">
+              <div className="absolute inset-0 rounded-xl bg-[linear-gradient(67deg,rgba(255,255,255,0.8)_0%,rgba(59,130,246,0.8)_25%,rgba(255,255,255,0.8)_50%,rgba(239,68,68,0.8)_75%,rgba(255,255,255,0.8)_100%)] bg-size-[200%_100%] animate-[barber_4s_linear_infinite] opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+
+              <button
+                onClick={() => navigate("/barbers")}
+                className="relative z-10 w-full py-3.5 rounded-xl font-bold text-sm tracking-wide shadow-md transition-all duration-300 cursor-pointer text-center active:scale-[0.98] bg-slate-900 text-white hover:bg-slate-800 group-hover/btn:bg-slate-900/90 dark:bg-linear-to-r dark:from-blue-600 dark:to-blue-500 dark:text-white sm:dark:bg-[#0f1115] sm:dark:from-transparent sm:dark:to-transparent sm:dark:border sm:dark:border-white/10 dark:hover:text-white sm:dark:group-hover/btn:bg-[#0f1115]/90"
+              >
+                Browse All Available Shops
               </button>
             </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
-            {services.map((filter, index) => (
-              <button
-                key={index}
-                onClick={() => handleFilterClick(filter)}
-                className={`px-4 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 cursor-pointer ${
-                  selectedService === filter
-                    ? "bg-blue-600 text-white border-blue-600 shadow-md scale-105"
-                    : "bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-600 dark:text-gray-300 hover:text-slate-900 hover:dark:text-white border-slate-900/5 dark:border-white/5"
-                }`}
-              >
-                {filter}
-              </button>
-            ))}
           </div>
         </div>
 
@@ -219,71 +185,87 @@ export const HomeFindBarber: FC = () => {
           tabIndex={0}
           className="slider-container lg:col-span-7 w-full flex flex-col items-center justify-center overflow-hidden relative min-h-110 px-2 focus:outline-hidden group"
         >
-          <div
-            ref={scrollContainerRef}
-            onScroll={handleScroll}
-            className="w-full flex items-center overflow-x-auto scroll-smooth snap-x snap-mandatory h-95 no-scrollbar px-[calc(50%-130px)] sm:px-[calc(50%-150px)] gap-6"
-            style={{
-              scrollbarWidth: "none",
-              WebkitOverflowScrolling: "touch",
-            }}
-          >
-            {featuredShops.map((shop, index) => {
-              const isCenter = index === currentIndex;
+          {loadingTopSalons ? (
+            <div className="flex gap-6 animate-pulse">
+              <div className="w-65 sm:w-75 h-95 bg-slate-200 dark:bg-white/5 rounded-3xl" />
+            </div>
+          ) : topSalons.length === 0 ? (
+            <p className="text-sm text-slate-400">
+              No active salons available.
+            </p>
+          ) : (
+            <>
+              <div
+                ref={scrollContainerRef}
+                onScroll={handleScroll}
+                className="w-full flex items-center overflow-x-auto scroll-smooth snap-x snap-mandatory h-95 no-scrollbar px-[calc(50%-130px)] sm:px-[calc(50%-150px)] gap-6"
+                style={{
+                  scrollbarWidth: "none",
+                  WebkitOverflowScrolling: "touch",
+                }}
+              >
+                {topSalons.map((salon, index) => {
+                  const isCenter = index === currentIndex;
 
-              return (
-                <div
-                  key={shop.id}
-                  onClick={() => handleDotClick(index)}
-                  className={`barber-card shrink-0 snap-center w-65 sm:w-75 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-900/10 dark:border-white/10 p-3 shadow-2xl backdrop-blur-md transition-all duration-500 ease-in-out cursor-pointer select-none ${
-                    isCenter
-                      ? "scale-100 opacity-100 z-20"
-                      : "scale-85 opacity-40 blur-[1px] z-10"
-                  }`}
-                >
-                  <div className="relative aspect-4/5 w-full rounded-2xl overflow-hidden group/img">
-                    <div className="absolute inset-0 bg-linear-to-t from-slate-950/90 via-slate-950/20 to-transparent z-10" />
-                    <img
-                      src={shop.image}
-                      alt={shop.name}
-                      className="w-full h-full object-cover pointer-events-none"
-                    />
-                    <div className="absolute bottom-4 left-4 right-4 z-20 text-white">
-                      <h3 className="font-bold text-lg tracking-tight">
-                        {shop.name}
-                      </h3>
-                      <p className="text-xs text-gray-300 flex items-center gap-1 mt-0.5">
-                        <FiMapPin className="text-red-400 h-3 w-3" />
-                        {shop.location}
-                      </p>
+                  return (
+                    <div
+                      key={salon.salonId}
+                      onClick={() => handleDotClick(index)}
+                      className={`barber-card shrink-0 snap-center w-65 sm:w-75 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-900/10 dark:border-white/10 p-3 shadow-2xl backdrop-blur-md transition-all duration-500 ease-in-out cursor-pointer select-none ${
+                        isCenter
+                          ? "scale-100 opacity-100 z-20"
+                          : "scale-85 opacity-40 blur-[1px] z-10"
+                      }`}
+                    >
+                      <div className="relative aspect-4/5 w-full rounded-2xl overflow-hidden group/img">
+                        <div className="absolute inset-0 bg-linear-to-t from-slate-950/90 via-slate-950/20 to-transparent z-10" />
+                        <img
+                          src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=600&q=80"
+                          alt={salon.name}
+                          className="w-full h-full object-cover pointer-events-none"
+                        />
+                        <div className="absolute bottom-4 left-4 right-4 z-20 text-white">
+                          <h3 className="font-bold text-lg tracking-tight truncate">
+                            {salon.name}
+                          </h3>
+                          <p className="text-xs text-gray-300 flex items-center gap-1 mt-0.5 truncate">
+                            <FiMapPin className="text-red-400 h-3 w-3 shrink-0" />
+                            {salon.address}, {salon.city}
+                          </p>
 
-                      <div className="flex items-center gap-1.5 mt-2.5 bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-lg w-fit text-xs font-semibold border border-white/10">
-                        <FiStar className="fill-amber-400 text-amber-400 h-3.5 w-3.5" />
-                        <span>{shop.rating}</span>
-                        <span className="text-gray-300 font-light">
-                          ({shop.reviews})
-                        </span>
+                          <div className="flex flex-wrap items-center gap-2 mt-3">
+                            <div className="flex items-center gap-1 bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-white/10">
+                              <FiUsers className="text-blue-400 h-3.5 w-3.5" />
+                              <span>{salon.staffCount} Staff</span>
+                            </div>
+
+                            <div className="flex items-center gap-1 bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-white/10">
+                              <FiCalendar className="text-emerald-400 h-3.5 w-3.5" />
+                              <span>{salon.totalBookings} Bookings</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
 
-          <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center gap-2 z-40">
-            {featuredShops.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => handleDotClick(index)}
-                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                  index === currentIndex
-                    ? "w-5 bg-blue-600 dark:bg-blue-400 opacity-100"
-                    : "w-2 bg-slate-400 dark:bg-gray-600 opacity-40"
-                }`}
-              />
-            ))}
-          </div>
+              <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center gap-2 z-40">
+                {topSalons.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleDotClick(index)}
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                      index === currentIndex
+                        ? "w-5 bg-blue-600 dark:bg-blue-400 opacity-100"
+                        : "w-2 bg-slate-400 dark:bg-gray-600 opacity-40"
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
 
           <div className="absolute top-2 right-4 text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block">
             Use ◄ / ► keys to navigate

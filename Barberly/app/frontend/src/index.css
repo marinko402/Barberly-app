@@ -7,8 +7,8 @@
 .Toastify__toast-body {
   font-family:
     ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  font-size: 0.875rem !important; /* text-sm */
-  font-weight: 500 !important; /* font-medium */
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
@@ -132,7 +132,10 @@
 
 @layer base {
   * {
-    @apply font-palanquin transition-all duration-200;
+    @apply font-palanquin transition-all duration-200 border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
   h1 {
     @apply text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight;
@@ -332,13 +335,4 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
 }

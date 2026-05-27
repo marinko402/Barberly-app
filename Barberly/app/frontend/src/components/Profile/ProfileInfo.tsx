@@ -57,6 +57,7 @@ const ProfileInfo: FC = () => {
         phoneNumber: data.phoneNumber,
         dateOfBirth: data.birthDate,
         password: "placeholder",
+        salonId: user?.salonId || "",
       }),
     onSuccess: (updatedUser) => {
       localStorage.setItem("user", JSON.stringify(updatedUser));
