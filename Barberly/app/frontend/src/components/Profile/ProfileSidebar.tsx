@@ -1,4 +1,4 @@
-import { useEffect, type FC, type ReactNode } from "react";
+import { type FC, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../../context/auth/useAuth";
 import barberlyLogo from "../../assets/images/BarberlyLogo3.png";
@@ -55,36 +55,13 @@ const profileTabs: ProfileTab[] = [
 const ProfileSidebar: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const { logout, user, role } = useAuth();
 
-  const role = localStorage.getItem("role");
   const hash = location.hash;
 
   const hasSalon = role === "Barber" ? !!user?.salonId : true;
 
-  useEffect(() => {
-    const allowed = profileTabs
-      .filter((tab) => tab.roles.includes(role!))
-      .filter(
-        (tab) => hasSalon || ["#info", "#security", "#salon"].includes(tab.key),
-      )
-      .map((tab) => tab.key)
-      .concat("");
-
-    if (!allowed.includes(hash)) {
-      navigate({ hash: "" }, { replace: true });
-    }
-  }, [hash, navigate, role, hasSalon]);
-
   const visibleTabs = profileTabs.filter((tab) => tab.roles.includes(role!));
-
-  const goTo = (value: string) => {
-    if (!hasSalon && (value === "#timeslots" || value === "#bookings")) {
-      navigate({ hash: "#salon" }, { replace: true });
-      return;
-    }
-    navigate({ hash: value }, { replace: true, state: location.state });
-  };
 
   return (
     <>
@@ -123,7 +100,12 @@ const ProfileSidebar: FC = () => {
               return (
                 <li
                   key={t.key}
-                  onClick={() => goTo(t.key)}
+                  onClick={() =>
+                    navigate(
+                      { hash: t.key },
+                      { replace: true, state: location.state },
+                    )
+                  }
                   className={`px-4 py-2.5 rounded-xl cursor-pointer transition-all text-xs font-medium flex items-center gap-2 whitespace-nowrap ${
                     isActive
                       ? "bg-white/10 border border-white/20 text-white shadow-md"
@@ -174,7 +156,12 @@ const ProfileSidebar: FC = () => {
                 return (
                   <li
                     key={t.key}
-                    onClick={() => goTo(t.key)}
+                    onClick={() =>
+                      navigate(
+                        { hash: t.key },
+                        { replace: true, state: location.state },
+                      )
+                    }
                     className={`px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 text-sm font-medium flex items-center justify-between group ${
                       isActive
                         ? "bg-white/5 border border-white/10 text-white shadow-lg"

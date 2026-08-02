@@ -84,7 +84,7 @@ export const Bookings: FC = () => {
                   />
 
                   <div
-                    className={`w-full rounded-2xl border p-5 backdrop-blur-md transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm ${
+                    className={`w-full rounded-2xl border p-5 backdrop-blur-md transition-all duration-300 flex flex-col lg:flex-row sm:items-center justify-between gap-4 shadow-sm ${
                       slot.isBooked
                         ? "bg-red-500/5 border-red-500/10"
                         : "bg-white/5 border-white/10"

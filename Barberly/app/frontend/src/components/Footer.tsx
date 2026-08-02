@@ -28,9 +28,9 @@ const Footer: FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto px-4 sm:px-10 text-center sm:text-left">
         <div className="flex flex-col items-center sm:items-start min-w-50">
           <h1 className="font-extrabold text-2xl tracking-tight">Contact us</h1>
-          <div className="pt-4 space-y-2 text-sm sm:text-base text-black/70 dark:text-white/70">
+          <div className="pt-4 pl-8 space-y-2 text-sm sm:text-base text-black/70 dark:text-white/70">
             <p>
-              <span className="font-semibold text-black dark:text-white">
+              <span className="text-black dark:text-white">
                 Customer Support:
               </span>
               <br />9 AM - 6 PM (Mon- Fri)
@@ -41,10 +41,8 @@ const Footer: FC = () => {
                 window.location.href = "tel:+1234567890";
               }}
             >
-              <span className="font-semibold text-black dark:text-white">
-                Call us:
-              </span>{" "}
-              +1 234 567 890
+              <span className="text-black dark:text-white">Call us:</span> +1
+              234 567 890
             </p>
             <p
               className="cursor-pointer hover:text-red-500 transition-colors"
@@ -53,9 +51,7 @@ const Footer: FC = () => {
                   "mailto:barberly@support.com?subject=Support Request";
               }}
             >
-              <span className="font-semibold text-black dark:text-white">
-                Mail:
-              </span>{" "}
+              <span className="text-black dark:text-white">Mail:</span>{" "}
               barberly@support.com
             </p>
           </div>
@@ -103,39 +99,48 @@ const Footer: FC = () => {
           </ul>
         </div>
 
-        <div className="flex flex-col items-center sm:items-start min-w-55 lg:items-end lg:text-right">
-          <h1 className="font-extrabold text-2xl tracking-tight">Stay Fresh</h1>
-          <p className="pt-4 text-sm text-black/60 dark:text-white/60 mb-3 max-w-62.5">
-            Subscribe to get special offers and barber tips.
-          </p>
-          <div className="flex w-full max-w-65 rounded-xl overflow-hidden border border-black/10 dark:border-white/10 p-0.5 bg-slate-100 dark:bg-white/5 backdrop-blur-md">
-            <input
-              type="email"
-              placeholder="Your email..."
-              className="w-full bg-transparent px-3 text-sm focus:outline-hidden text-black dark:text-white placeholder-black/40 dark:placeholder-white/40"
-            />
-            <button className="bg-linear-to-r from-blue-600 to-red-500 dark:from-blue-500 dark:to-red-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity cursor-pointer">
-              Join
-            </button>
-          </div>
+        <div className="flex flex-col items-center sm:items-start min-w-37.5">
+          <h1 className="font-extrabold text-2xl tracking-tight">Find Us</h1>
+          <div className="pl-8 flex flex-col gap-2 pt-4 text-sm sm:text-base">
+            <a
+              href="https://www.instagram.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 text-black/50 hover:text-black dark:text-white/50 hover:dark:text-white transition-colors group cursor-pointer"
+            >
+              <FaSquareInstagram className="h-5 w-5 text-black/60 dark:text-white/60 group-hover:text-black group-hover:dark:text-white transition-colors" />
+              <span>Instagram</span>
+            </a>
 
-          <div className="flex gap-4 items-center justify-center sm:justify-start lg:justify-end w-full h-fit mt-6">
-            <FaSquareInstagram
-              className="h-6 w-6 cursor-pointer text-black/60 dark:text-white/60 hover:text-black hover:dark:text-white transition-colors"
-              onClick={() => window.open("https://www.instagram.com/")}
-            />
-            <FaFacebookSquare
-              className="h-6 w-6 cursor-pointer text-black/60 dark:text-white/60 hover:text-black hover:dark:text-white transition-colors"
-              onClick={() => window.open("https://www.facebook.com/")}
-            />
-            <FaSquareXTwitter
-              className="h-6 w-6 cursor-pointer text-black/60 dark:text-white/60 hover:text-black hover:dark:text-white transition-colors"
-              onClick={() => window.open("https://www.twitter.com/")}
-            />
-            <FaLinkedin
-              className="h-6 w-6 cursor-pointer text-black/60 dark:text-white/60 hover:text-black hover:dark:text-white transition-colors"
-              onClick={() => window.open("https://www.linkedin.com/")}
-            />
+            <a
+              href="https://www.facebook.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 text-black/50 hover:text-black dark:text-white/50 hover:dark:text-white transition-colors group cursor-pointer"
+            >
+              <FaFacebookSquare className="h-5 w-5 text-black/60 dark:text-white/60 group-hover:text-black group-hover:dark:text-white transition-colors" />
+              <span>Facebook</span>
+            </a>
+
+            <a
+              href="https://www.x.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 text-black/50 hover:text-black dark:text-white/50 hover:dark:text-white transition-colors group cursor-pointer"
+            >
+              <FaSquareXTwitter className="h-5 w-5 text-black/60 dark:text-white/60 group-hover:text-black group-hover:dark:text-white transition-colors" />
+              <span>X</span>
+            </a>
+
+            <a
+              href="https://www.linkedin.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 text-black/50 hover:text-black dark:text-white/50 hover:dark:text-white transition-colors group cursor-pointer"
+            >
+              <FaLinkedin className="h-5 w-5 text-black/60 dark:text-white/60 group-hover:text-black group-hover:dark:text-white transition-colors" />
+              <span>LinkedIn</span>
+            </a>
           </div>
         </div>
       </div>

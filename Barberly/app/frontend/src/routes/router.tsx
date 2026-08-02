@@ -9,6 +9,13 @@ import { ProtectedLoader } from "./ProtectedLoader";
 import Barber from "../pages/Barber";
 import { LoginLoader } from "./LoginLoader";
 import Salon from "../pages/Salon";
+import { Loader } from "lucide-react";
+
+const pageLoader = (
+  <div className="w-dvw h-dvh flex justify-center items-center text-2xl gap-5">
+    <p>Loading</p> <Loader className="animate-spin" />
+  </div>
+);
 
 export const router = createBrowserRouter([
   {
@@ -22,11 +29,13 @@ export const router = createBrowserRouter([
         path: "login",
         element: <Login />,
         loader: LoginLoader,
+        hydrateFallbackElement: pageLoader,
       },
       {
         path: "register",
         element: <Register />,
         loader: LoginLoader,
+        hydrateFallbackElement: pageLoader,
       },
       {
         path: "barbers",
@@ -36,6 +45,7 @@ export const router = createBrowserRouter([
         path: "profile",
         element: <Profile />,
         loader: ProtectedLoader,
+        hydrateFallbackElement: pageLoader,
       },
       {
         path: "salon/:name",

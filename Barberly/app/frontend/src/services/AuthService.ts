@@ -48,6 +48,14 @@ export const login = async (user: LoginUser) => {
   }
 };
 
+export const logoutApi = async () => {
+  try {
+    await apiClient.post("api/Auth/Logout");
+  } catch (e) {
+    console.log("Logout error: ", e);
+  }
+};
+
 export const getUserData = async (id: string) => {
   try {
     const res = await apiClient.get(`api/Auth/GetUserData/${id}`);
@@ -57,6 +65,16 @@ export const getUserData = async (id: string) => {
     throw e;
   }
 };
+
+export const getCurrentUser = async () => {
+  try {
+    const res = await apiClient.get("api/Auth/Me");
+    return res.data;
+  } catch (e) {
+    console.log("Error getting  current user data: ", e);
+    throw e;
+  }
+}
 
 export const updateUser = async (user: User) => {
   try {
@@ -101,7 +119,6 @@ export const changePassword = async (
       currentPassword: oldPassword,
       newPassword: newPassword,
     });
-    toast.success("Password changed successfully!");
     return response.data;
   } catch (e) {
     throw e;

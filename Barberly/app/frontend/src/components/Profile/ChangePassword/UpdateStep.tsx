@@ -68,7 +68,7 @@ export const UpdateStep: FC<UpdateStepProps> = ({
       onSubmit={handleSubmit(handleFormSubmit)}
       className="w-full h-full flex flex-col justify-between"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6 w-full">
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
             New Password

@@ -60,7 +60,6 @@ const ProfileInfo: FC = () => {
         salonId: user?.salonId || "",
       }),
     onSuccess: (updatedUser) => {
-      localStorage.setItem("user", JSON.stringify(updatedUser));
       updateUserContext(updatedUser);
 
       toast.success("Profile updated successfully!");

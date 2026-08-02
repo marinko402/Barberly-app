@@ -15,7 +15,6 @@ import { SalonForm } from "./SalonForm";
 import { AddBarberPanel } from "./AddBarberPanel";
 import type { Barber } from "../../../models/Barber";
 import { getUserData } from "../../../services/AuthService";
-import type { User } from "../../../models/User";
 
 const MySalon: FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -59,14 +58,14 @@ const MySalon: FC = () => {
         try {
           const userData = await getUserData(currentUserId);
 
-          const updatedStorageData: User = {
+          const updatedStorageData = {
             id: userData.id,
             userName: userData.userName,
             email: userData.email,
             firstName: userData.firstName,
             lastName: userData.lastName,
             phoneNumber: userData.phoneNumber,
-            dateOfBirth: userData.birthDate,
+            birthDate: userData.birthDate,
             salonId: userData.salonId,
             password: "placeholder",
           };
@@ -138,15 +137,15 @@ const MySalon: FC = () => {
       if (currentUserId) {
         try {
           const userData = await getUserData(currentUserId);
-          const updatedStorageData: User = {
+          const updatedStorageData = {
             id: userData.id,
             userName: userData.userName,
             email: userData.email,
             firstName: userData.firstName,
             lastName: userData.lastName,
             phoneNumber: userData.phoneNumber,
-            dateOfBirth: userData.birthDate,
-            salonId: userData.salonId, 
+            birthDate: userData.birthDate,
+            salonId: userData.salonId,
             password: "placeholder",
           };
           updateUserContext(updatedStorageData);

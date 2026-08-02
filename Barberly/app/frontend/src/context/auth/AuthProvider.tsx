@@ -9,47 +9,27 @@ import {
 } from "react";
 import { toast } from "react-toastify";
 import { AuthContext } from "./AuthContext";
-import { getUserData, login, register } from "../../services/AuthService";
-import { jwtDecode } from "jwt-decode";
-import type { JwtPayload } from "../../models/jwt.ts";
-import axios from "axios";
+import {
+  getUserData,
+  login,
+  logoutApi,
+  register,
+} from "../../services/AuthService";
+import apiClient from "../../services/client";
 
 type Props = { children: ReactNode };
 
 export const AuthProvider: FC<Props> = ({ children }) => {
   const navigate = useNavigate();
-  const [token, setToken] = useState<string | null>(() =>
-    localStorage.getItem("token"),
-  );
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem("user");
-    return stored ? JSON.parse(stored) : null;
-  });
-  const [isReady, setIsReady] = useState<boolean>(true);
-  const [role, setRole] = useState<string>(
-    () => localStorage.getItem("role") ?? "",
-  );
-  const [id, setId] = useState<string>(() => {
-    try {
-      const storedToken = localStorage.getItem("token");
-      if (!storedToken) return "";
-      const decoded = jwtDecode<JwtPayload>(storedToken);
-      return decoded.id;
-    } catch {
-      localStorage.removeItem("token");
-      return "";
-    }
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<string>("");
+  const [id, setId] = useState<string>("");
 
   const logout = useCallback(
-    (expired = false) => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("role");
-      localStorage.removeItem("tokenExpiresAt");
+    async (expired = false) => {
+      await logoutApi();
 
       setUser(null);
-      setToken("");
       setRole("");
       setId("");
 
@@ -62,89 +42,32 @@ export const AuthProvider: FC<Props> = ({ children }) => {
   );
 
   useEffect(() => {
-    const expiresAt = localStorage.getItem("tokenExpiresAt");
-    if (!expiresAt) return;
+    const interceptor = apiClient.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const requestUrl = error.config?.url || "";
+        const isMeRoute = requestUrl.includes("Auth/Me");
 
-    const timeout = Number(expiresAt) - Date.now();
-
-    if (timeout <= 0) {
-      setTimeout(() => logout(true), 0);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      logout(true);
-    }, timeout);
-
-    return () => clearTimeout(timer);
-  }, [logout]);
-
-  useEffect(() => {
-    const interceptor = axios.interceptors.request.use(
-      (config) => {
-        const expiresAt = localStorage.getItem("tokenExpiresAt");
-
-        if (expiresAt && Date.now() > Number(expiresAt)) {
+        if (error.response && error.response.status === 401 && !isMeRoute) {
           logout(true);
-          return Promise.reject(new Error("Token expired"));
         }
-
-        const token = localStorage.getItem("token");
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-
-        return config;
+        return Promise.reject(error);
       },
-      (error) => Promise.reject(error),
     );
 
     return () => {
-      axios.interceptors.request.eject(interceptor);
+      apiClient.interceptors.response.eject(interceptor);
     };
   }, [logout]);
 
-  const registerUser = async (user: User) => {
-    try {
-      await register(user);
-      // await loginUser({ username: user.userName, password: user.password });
-    } catch (e) {
-      console.log(e);
-      throw e;
-    }
-  };
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const res = await apiClient.get("api/Auth/Me");
+        const userData = res.data;
 
-  const loginUser = async (user: LoginUser) => {
-    try {
-      await login(user)
-        .then(async (res) => {
-          const data = res?.data;
-          const token = data?.token;
-          const decoded = jwtDecode<JwtPayload>(token);
-
-          console.log("DECODED TOKEN", decoded);
-
-          const expiresAt = decoded.exp * 1000;
-          localStorage.setItem("tokenExpiresAt", expiresAt.toString());
-
-          const id = decoded.id;
-          setId(id);
-
-          localStorage.setItem("token", data.token);
-          setToken(data.token);
-
-          localStorage.setItem("role", decoded.role);
-          setRole(decoded.role);
-
-          axios.defaults.headers.common["Authorization"] =
-            `Bearer ${data.token}`;
-
-          let userData;
-          userData = await getUserData(id);
-
-          console.log("USER DATA", userData);
-
-          const storageData: User = {
+        if (userData) {
+          const mappedUser: User = {
             id: userData.id,
             userName: userData.userName,
             email: userData.email,
@@ -156,31 +79,93 @@ export const AuthProvider: FC<Props> = ({ children }) => {
             password: "placeholder",
           };
 
-          localStorage.setItem("user", JSON.stringify(storageData));
-          setUser(storageData);
+          setUser(mappedUser);
+          setId(userData.id);
+          setRole(userData.role || "Barber");
+        }
+      } catch {
+        setUser(null);
+      }
+    };
 
-          setIsReady(true);
+    initializeAuth();
+  }, []);
 
-          toast.success("Login success!");
-          navigate("/profile");
-        })
-        .catch((e) => {
-          console.log("LOGIN ERROR: " + e);
-        });
+  const registerUser = async (user: User) => {
+    try {
+      await register(user);
     } catch (e) {
       console.log(e);
       throw e;
     }
   };
 
-  const isLoggedIn = (): boolean => {
-    return !!localStorage.getItem("token");
+  const loginUser = async (credentials: LoginUser) => {
+    try {
+      const res = await login(credentials);
+      const data = res?.data;
+
+      const userId = data?.userId;
+      const userRole = data?.roles?.[0] ?? "";
+
+      setId(userId);
+      setRole(userRole);
+
+      const userData = await getUserData(userId);
+
+      const storageData: User = {
+        id: userData.id,
+        userName: userData.userName,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phoneNumber: userData.phoneNumber,
+        dateOfBirth: userData.birthDate,
+        salonId: userData.salonId,
+        password: "placeholder",
+      };
+
+      setUser(storageData);
+
+      toast.success("Login success!");
+      navigate("/profile");
+    } catch (e) {
+      console.log("LOGIN ERROR: " + e);
+      throw e;
+    }
   };
 
-  const updateUserContext = useCallback((updatedUser: User) => {
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setUser(updatedUser);
-  }, []);
+  const isLoggedIn = (): boolean => {
+    return !!user;
+  };
+
+  const updateUserContext = useCallback(
+    (updatedUser: {
+      id: string;
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+      userName: string;
+      birthDate: string;
+      phoneNumber: string;
+      salonId: string;
+    }) => {
+      const uu: User = {
+        id: updatedUser.id,
+        userName: updatedUser.userName,
+        email: updatedUser.email,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        phoneNumber: updatedUser.phoneNumber,
+        dateOfBirth: updatedUser.birthDate,
+        salonId: updatedUser.salonId,
+        password: "placeholder",
+      };
+      setUser(uu);
+    },
+    [],
+  );
 
   return (
     <AuthContext.Provider
@@ -188,15 +173,14 @@ export const AuthProvider: FC<Props> = ({ children }) => {
         registerUser,
         loginUser,
         user,
-        token,
-        logout,
+        logout: () => logout(false),
         isLoggedIn,
         role,
         id,
         updateUserContext,
       }}
     >
-      {isReady ? children : null}
+      {children}
     </AuthContext.Provider>
   );
 };
