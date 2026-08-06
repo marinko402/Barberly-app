@@ -1,4 +1,4 @@
-import { redirect, type LoaderFunctionArgs } from "react-router-dom";
+import { redirect, type LoaderFunctionArgs } from "react-router";
 import apiClient from "../services/client";
 
 export const ProtectedLoader = async ({ request }: LoaderFunctionArgs) => {

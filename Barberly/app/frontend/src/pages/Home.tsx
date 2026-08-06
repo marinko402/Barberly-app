@@ -1,6 +1,6 @@
 import { useEffect, type FC } from "react";
 import HomeStart from "../components/HomeScreen/HomeStart";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { HomeFindBarber } from "../components/HomeScreen/HomeFindBarber";
 import AboutUs from "../components/HomeScreen/AboutUs";
 

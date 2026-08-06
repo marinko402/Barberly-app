@@ -2,7 +2,7 @@ import { type FC } from "react";
 import { BsCCircle } from "react-icons/bs";
 import { FaFacebookSquare, FaLinkedin } from "react-icons/fa";
 import { FaSquareInstagram, FaSquareXTwitter } from "react-icons/fa6";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router";
 
 const Footer: FC = () => {
   const navigate = useNavigate();

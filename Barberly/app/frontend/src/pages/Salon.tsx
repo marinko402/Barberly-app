@@ -1,6 +1,6 @@
 import { type FC, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { FiCalendar, FiArrowLeft } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { getSalonById } from "../services/SalonService";
@@ -82,7 +82,7 @@ const Salon: FC = () => {
   }
 
   return (
-    <div className="w-dvw h-dvh pt-20 text-white py-28 px-5 sm:px-8 bg-barber-shop bg-no-repeat bg-cover bg-center overflow-auto">
+    <div className="w-dvw h-dvh pt-25 text-white py-28 px-5 sm:px-8 bg-barber-shop bg-no-repeat bg-cover bg-center overflow-auto">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] z-0" />
 
       <div className="relative z-10 mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-7xl overflow-auto">
