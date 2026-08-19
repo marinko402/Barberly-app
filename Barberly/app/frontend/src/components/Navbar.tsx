@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router";
 import { IoMenu } from "react-icons/io5";
 import { useState, type FC } from "react";
 import { CgProfile } from "react-icons/cg";

@@ -4,7 +4,7 @@ import barberlyLogo from "../assets/images/barberlyLogo3.png";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { CgProfile } from "react-icons/cg";

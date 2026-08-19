@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router";
 import { AnimatePresence } from "framer-motion";
 import ScrollToTop from "../components/ScrollToTop";
 import { AuthProvider } from "../context/auth/AuthProvider";
