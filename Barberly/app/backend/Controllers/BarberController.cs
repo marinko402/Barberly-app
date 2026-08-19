@@ -35,9 +35,22 @@ public class BarberController : ControllerBase
     [HttpPost("CreateBarber")]
     public async Task<ActionResult<Barber>> CreateBarber([FromBody] BarberDto barberDto)
     {
+        if (barberDto == null)
+        {
+            return BadRequest("Barber data is required");
+        }
+
+        if (
+            string.IsNullOrWhiteSpace(barberDto.firstName)
+            || string.IsNullOrWhiteSpace(barberDto.lastName)
+            || string.IsNullOrWhiteSpace(barberDto.email)
+        )
+        {
+            return BadRequest("All fields are required");
+        }
+
         var barber = new Barber
         {
-            //barberId = Guid.NewGuid(),
             firstName = barberDto.firstName,
             lastName = barberDto.lastName,
             Email = barberDto.email,
@@ -50,11 +63,25 @@ public class BarberController : ControllerBase
     }
 
     [HttpPut("UpdateBarber/{id}")]
-    public async Task<IActionResult> UpdateBarber(Guid id, [FromBody] BarberDto barber)
+    public async Task<IActionResult> UpdateBarber(string id, [FromBody] BarberDto barber)
     {
         var existing = await context.Barbers.FindAsync(id);
         if (existing == null)
             return NotFound();
+
+        if (barber == null)
+        {
+            return BadRequest("Barber data is required");
+        }
+
+        if (
+            string.IsNullOrWhiteSpace(barber.firstName)
+            || string.IsNullOrWhiteSpace(barber.lastName)
+            || string.IsNullOrWhiteSpace(barber.email)
+        )
+        {
+            return BadRequest("All fields are required");
+        }
 
         existing.firstName = barber.firstName;
         existing.lastName = barber.lastName;
