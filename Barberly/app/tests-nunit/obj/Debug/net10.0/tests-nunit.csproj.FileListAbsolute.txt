@@ -233,3 +233,5 @@ C:\Users\User\Desktop\TIKS projekat\Barberly\app\tests-nunit\obj\Debug\net10.0\r
 C:\Users\User\Desktop\TIKS projekat\Barberly\app\tests-nunit\obj\Debug\net10.0\tests-nunit.pdb
 C:\Users\User\Desktop\TIKS projekat\Barberly\app\tests-nunit\obj\Debug\net10.0\tests-nunit.genruntimeconfig.cache
 C:\Users\User\Desktop\TIKS projekat\Barberly\app\tests-nunit\obj\Debug\net10.0\ref\tests-nunit.dll
+C:\Users\User\Desktop\TIKS projekat\Barberly\app\tests-nunit\bin\Debug\net10.0\Castle.Core.dll
+C:\Users\User\Desktop\TIKS projekat\Barberly\app\tests-nunit\bin\Debug\net10.0\Moq.dll

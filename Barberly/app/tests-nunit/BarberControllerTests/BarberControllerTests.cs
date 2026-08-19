@@ -1,8 +1,10 @@
+using System.Security.Claims;
 using System.Threading.Tasks;
 using backend.Controllers;
 using backend.Data;
 using backend.Dtos;
 using backend.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -30,6 +32,9 @@ public class BarberControllerTests
         _context.Dispose();
     }
 
+    ////////////                 CREATE                      ////////////////////////////
+    ///
+    ///
     [Test]
     public async Task CreateBarber_ShouldReturnOk_AndSaveBarber()
     {
@@ -224,5 +229,99 @@ public class BarberControllerTests
         var result = await _controller.UpdateBarber(barber.Id, null);
 
         Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+    }
+
+    ////////////                 DELETE                      ////////////////////////////
+    ///
+    ///
+    [Test]
+    public async Task DeleteBarber_ShouldReturnNoContent_WhenUserDeletesOwnAccount()
+    {
+        var id = Guid.NewGuid().ToString();
+
+        var barber = new Barber
+        {
+            Id = id,
+            firstName = "Marko",
+            lastName = "Markovic",
+            Email = "marko@test.com",
+        };
+
+        _context.Barbers.Add(barber);
+        await _context.SaveChangesAsync();
+
+        var claims = new[] { new Claim(ClaimTypes.NameIdentifier, id) };
+
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth")),
+            },
+        };
+
+        var result = await _controller.DeleteBarber(id);
+
+        Assert.That(result, Is.TypeOf<NoContentResult>());
+
+        var deletedBarber = await _context.Barbers.FindAsync(id);
+
+        Assert.That(deletedBarber, Is.Null);
+    }
+
+    [Test]
+    public async Task DeleteBarber_ShouldReturnForbid_WhenUserDeletesAnotherAccount()
+    {
+        var loggedInUserId = Guid.NewGuid().ToString();
+        var otherBarberId = Guid.NewGuid().ToString();
+
+        var barber = new Barber
+        {
+            Id = otherBarberId,
+            firstName = "Petar",
+            lastName = "Petrovic",
+            Email = "petar@test.com",
+        };
+
+        _context.Barbers.Add(barber);
+        await _context.SaveChangesAsync();
+
+        var claims = new[] { new Claim(ClaimTypes.NameIdentifier, loggedInUserId) };
+
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth")),
+            },
+        };
+
+        var result = await _controller.DeleteBarber(otherBarberId);
+
+        Assert.That(result, Is.TypeOf<ForbidResult>());
+
+        var barberInDb = await _context.Barbers.FindAsync(otherBarberId);
+
+        Assert.That(barberInDb, Is.Not.Null);
+    }
+
+    [Test]
+    public async Task DeleteBarber_ShouldReturnNotFound_WhenBarberDoesNotExist()
+    {
+        var id = Guid.NewGuid().ToString();
+
+        var claims = new[] { new Claim(ClaimTypes.NameIdentifier, id) };
+
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth")),
+            },
+        };
+
+        var result = await _controller.DeleteBarber(id);
+
+        Assert.That(result, Is.TypeOf<NotFoundResult>());
     }
 }

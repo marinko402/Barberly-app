@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using backend.Data;
 using backend.Dtos;
 using backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -92,15 +94,26 @@ public class BarberController : ControllerBase
         return NoContent();
     }
 
+    [Authorize]
     [HttpDelete("DeleteBarber/{id}")]
-    public async Task<IActionResult> DeleteBarber(Guid id)
+    public async Task<IActionResult> DeleteBarber(string id)
     {
+        var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (loggedInUserId == null)
+            return Unauthorized();
+
+        if (loggedInUserId != id)
+            return Forbid();
+
         var barber = await context.Barbers.FindAsync(id);
+
         if (barber == null)
             return NotFound();
 
         context.Barbers.Remove(barber);
         await context.SaveChangesAsync();
+
         return NoContent();
     }
 }
