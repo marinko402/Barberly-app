@@ -1,0 +1,16 @@
+bin/
+obj/
+
+.bin/
+
+Videos/
+Images/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+.vs/
+.vscode/
+*.user
+*.suo
