@@ -3,6 +3,7 @@ using backend.Data;
 using backend.Dtos;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,10 +14,12 @@ namespace backend.Controllers;
 public class BarberController : ControllerBase
 {
     private DataContext context { get; set; }
+    private readonly UserManager<Barber> _userManager;
 
-    public BarberController(DataContext context)
+    public BarberController(DataContext context, UserManager<Barber> userManager)
     {
         this.context = context;
+        _userManager = userManager;
     }
 
     [HttpGet("GetAllBarbers")]
@@ -106,13 +109,15 @@ public class BarberController : ControllerBase
         if (loggedInUserId != id)
             return Forbid();
 
-        var barber = await context.Barbers.FindAsync(id);
+        var barber = await _userManager.FindByIdAsync(id);
 
         if (barber == null)
             return NotFound();
 
-        context.Barbers.Remove(barber);
-        await context.SaveChangesAsync();
+        var result = await _userManager.DeleteAsync(barber);
+
+        if (!result.Succeeded)
+            return BadRequest(result.Errors);
 
         return NoContent();
     }
