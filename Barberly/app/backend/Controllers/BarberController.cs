@@ -29,7 +29,7 @@ public class BarberController : ControllerBase
     }
 
     [HttpGet("GetBarberById/{id}")]
-    public async Task<ActionResult<Barber>> GetBarberById(Guid id)
+    public async Task<ActionResult<Barber>> GetBarberById(string id)
     {
         var barber = await context.Barbers.FindAsync(id);
         if (barber == null)
@@ -49,6 +49,9 @@ public class BarberController : ControllerBase
             string.IsNullOrWhiteSpace(barberDto.firstName)
             || string.IsNullOrWhiteSpace(barberDto.lastName)
             || string.IsNullOrWhiteSpace(barberDto.email)
+            || string.IsNullOrWhiteSpace(barberDto.userName)
+            || string.IsNullOrWhiteSpace(barberDto.password)
+            || string.IsNullOrWhiteSpace(barberDto.phoneNumber)
         )
         {
             return BadRequest("All fields are required");
@@ -59,10 +62,19 @@ public class BarberController : ControllerBase
             firstName = barberDto.firstName,
             lastName = barberDto.lastName,
             Email = barberDto.email,
+            UserName = barberDto.userName,
+            PasswordHash = barberDto.password,
+            PhoneNumber = barberDto.phoneNumber,
         };
 
-        context.Barbers.Add(barber);
-        await context.SaveChangesAsync();
+        var result = await _userManager.CreateAsync(barber, barberDto.password);
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        await _userManager.AddToRoleAsync(barber, "Barber");
 
         return Ok(barber);
     }
@@ -101,7 +113,7 @@ public class BarberController : ControllerBase
     [HttpDelete("DeleteBarber/{id}")]
     public async Task<IActionResult> DeleteBarber(string id)
     {
-        var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var loggedInUserId = User.FindFirstValue("id");
 
         if (loggedInUserId == null)
             return Unauthorized();
