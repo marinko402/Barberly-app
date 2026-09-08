@@ -137,7 +137,7 @@ public class TimeslotController : ControllerBase
 
     [HttpGet("GetBarberDailySchedule")]
     public async Task<IActionResult> GetBarberDailySchedule(
-        [FromQuery] Guid barberId,
+        [FromQuery] string barberId,
         [FromQuery] DateOnly date
     )
     {
