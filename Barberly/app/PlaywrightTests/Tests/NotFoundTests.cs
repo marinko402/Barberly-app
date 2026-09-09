@@ -12,14 +12,6 @@ public class NotFoundTests : PageTest
     [SetUp]
     public async Task Setup()
     {
-        await Page.RouteAsync(
-            "**/api/Auth/Me",
-            async route =>
-            {
-                await route.FulfillAsync(new RouteFulfillOptions { Status = 401 });
-            }
-        );
-
         await Page.GotoAsync($"{APIUrl}/non-existent-page-12345");
     }
 

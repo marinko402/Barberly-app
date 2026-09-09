@@ -12,40 +12,26 @@ public class NavbarTests : PageTest
     [SetUp]
     public async Task SetUp()
     {
-        await MockUnauthenticatedUser();
+        await EnsureUnauthenticatedUserAsync();
         await Page.GotoAsync($"{apiUrl}/");
     }
 
-    private async Task MockUnauthenticatedUser()
+    private async Task EnsureUnauthenticatedUserAsync()
     {
-        await Page.RouteAsync(
-            "**/Me",
-            async route =>
-                await route.FulfillAsync(
-                    new()
-                    {
-                        Status = 401,
-                        ContentType = "application/json",
-                        Body = "{\"message\": \"Unauthenticated\"}",
-                    }
-                )
-        );
+        await Context.ClearCookiesAsync();
     }
 
-    private async Task MockAuthenticatedUser()
+    private async Task EnsureAuthenticatedUserAsync()
     {
-        await Page.RouteAsync(
-            "**/Me",
-            async route =>
-                await route.FulfillAsync(
-                    new()
-                    {
-                        Status = 200,
-                        ContentType = "application/json",
-                        Body = "{\"id\": 1, \"name\": \"Dusan\", \"role\": \"Client\"}",
-                    }
-                )
-        );
+        await Context.ClearCookiesAsync();
+
+        await Page.GotoAsync($"{apiUrl}/login");
+
+        await Page.GetByPlaceholder("Enter your username").FillAsync("username");
+        await Page.GetByPlaceholder("••••••••").FillAsync("#Sifra123");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Login" }).ClickAsync();
+
+        await Expect(Page).ToHaveURLAsync($"{apiUrl}/profile");
     }
 
     [Test]
@@ -61,7 +47,7 @@ public class NavbarTests : PageTest
     [Test]
     public async Task Navbar_AuthenticatedUser_ShouldNavigateToProfileWhenClickingAvatar()
     {
-        await MockAuthenticatedUser();
+        await EnsureAuthenticatedUserAsync();
         await Page.GotoAsync($"{apiUrl}/");
 
         var profileLink = Page.Locator("nav a[href='/profile']");

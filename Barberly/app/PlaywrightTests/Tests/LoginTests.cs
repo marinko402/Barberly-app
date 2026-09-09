@@ -88,57 +88,8 @@ public class LoginTests : PageTest
     [Test]
     public async Task Login_SuccessfulAuth_ShouldRedirectToProfile()
     {
-        await Page.RouteAsync(
-            "**/api/**",
-            async route =>
-            {
-                var url = route.Request.Url;
-                var method = route.Request.Method;
-
-                if (url.Contains("/api/Auth/Login") && method == "POST")
-                {
-                    await route.FulfillAsync(
-                        new RouteFulfillOptions
-                        {
-                            Status = 200,
-                            ContentType = "application/json",
-                            Body = "{\"userId\": \"user-123\", \"roles\": [\"Barber\"]}",
-                        }
-                    );
-                    return;
-                }
-
-                if (
-                    url.Contains("/api/Auth/Me")
-                    || url.Contains("/api/Auth/User")
-                    || url.Contains("/api/User")
-                )
-                {
-                    await route.FulfillAsync(
-                        new RouteFulfillOptions
-                        {
-                            Status = 200,
-                            ContentType = "application/json",
-                            Body =
-                                "{\"id\": \"user-123\", \"userName\": \"dusan123\", \"email\": \"dusan@test.com\", \"firstName\": \"Dusan\", \"lastName\": \"Maksimovic\", \"phoneNumber\": \"123456\", \"birthDate\": \"2000-01-01\", \"salonId\": \"salon-1\", \"role\": \"Barber\"}",
-                        }
-                    );
-                    return;
-                }
-
-                await route.FulfillAsync(
-                    new RouteFulfillOptions
-                    {
-                        Status = 200,
-                        ContentType = "application/json",
-                        Body = "[]",
-                    }
-                );
-            }
-        );
-
-        await Page.GetByPlaceholder("Enter your username").FillAsync("dusan123");
-        await Page.GetByPlaceholder("••••••••").FillAsync("Password123!");
+        await Page.GetByPlaceholder("Enter your username").FillAsync("username");
+        await Page.GetByPlaceholder("••••••••").FillAsync("#Sifra123");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Login" }).ClickAsync();
 
         await Expect(Page).ToHaveURLAsync($"{APIUrl}/profile");
@@ -147,16 +98,10 @@ public class LoginTests : PageTest
     [Test]
     public async Task Login_FailedAuth_ShouldShowToastError()
     {
-        await Page.RouteAsync(
-            "**/api/Auth/Login",
-            async route =>
-            {
-                await route.FulfillAsync(new RouteFulfillOptions { Status = 401 });
-            }
-        );
+        await Context.ClearCookiesAsync();
 
-        await Page.GetByPlaceholder("Enter your username").FillAsync("dusan123");
-        await Page.GetByPlaceholder("••••••••").FillAsync("WrongPassword123!");
+        await Page.GetByPlaceholder("Enter your username").FillAsync("username");
+        await Page.GetByPlaceholder("••••••••").FillAsync("#Sifra12");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Login" }).ClickAsync();
 
         await Expect(Page.GetByText("Error while logging!")).ToBeVisibleAsync();

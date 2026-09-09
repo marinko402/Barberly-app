@@ -9,21 +9,14 @@ namespace PlaywrightTests.Tests;
 public class RegisterTests : PageTest
 {
     private const string BaseUrl = "https://localhost:5174";
+    private string _uniqueUsername = string.Empty;
+    private string _uniqueEmail = string.Empty;
 
     [SetUp]
     public async Task Setup()
     {
-        await Page.RouteAsync(
-            "**/api/Auth/Me",
-            async route =>
-            {
-                await route.FulfillAsync(new RouteFulfillOptions { Status = 401 });
-            }
-        );
-
         await Page.GotoAsync($"{BaseUrl}/register");
     }
-
 
     [Test]
     public async Task Register_PageRender_ShouldDisplayAllFormFieldsAndButtons()
@@ -48,7 +41,6 @@ public class RegisterTests : PageTest
         await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Go home" }))
             .ToBeVisibleAsync();
     }
-
 
     [Test]
     public async Task Register_EmptySubmit_ShouldShowAllRequiredValidationErrors()
@@ -94,7 +86,6 @@ public class RegisterTests : PageTest
         await Expect(Page.GetByText("Passwords do not match.")).ToBeVisibleAsync();
     }
 
-
     [Test]
     public async Task Register_TogglePasswordVisibility_ShouldSwitchInputType()
     {
@@ -107,25 +98,9 @@ public class RegisterTests : PageTest
         await Expect(passwordInput).ToHaveAttributeAsync("type", "text");
     }
 
-
     [Test]
     public async Task Register_SuccessfulAuth_ShouldShowSuccessToastAndRedirectToLogin()
     {
-        await Page.RouteAsync(
-            "**/api/Auth/Register",
-            async route =>
-            {
-                await route.FulfillAsync(
-                    new RouteFulfillOptions
-                    {
-                        Status = 200,
-                        ContentType = "application/json",
-                        Body = "{\"message\": \"User registered successfully\"}",
-                    }
-                );
-            }
-        );
-
         await FillValidRegistrationForm();
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Register" }).ClickAsync();
@@ -137,22 +112,12 @@ public class RegisterTests : PageTest
     [Test]
     public async Task Register_FailedApiCall_ShouldShowErrorToast()
     {
-        await Page.RouteAsync(
-            "**/api/Auth/Register",
-            async route =>
-            {
-                await route.FulfillAsync(
-                    new RouteFulfillOptions
-                    {
-                        Status = 400,
-                        ContentType = "application/json",
-                        Body = "{\"message\": \"Username already exists\"}",
-                    }
-                );
-            }
-        );
-
         await FillValidRegistrationForm();
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Register" }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
+
+        await Page.GotoAsync($"{BaseUrl}/register");
+        await FillValidRegistrationForm(_uniqueUsername, _uniqueEmail);
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Register" }).ClickAsync();
 
@@ -174,12 +139,19 @@ public class RegisterTests : PageTest
         await Expect(Page).ToHaveURLAsync($"{BaseUrl}/");
     }
 
-    private async Task FillValidRegistrationForm()
+    private async Task FillValidRegistrationForm(
+        string? customUsername = null,
+        string? customEmail = null
+    )
     {
+        var randomId = Guid.NewGuid().ToString()[..8];
+        _uniqueUsername = customUsername ?? $"user_{randomId}";
+        _uniqueEmail = customEmail ?? $"user_{randomId}@example.com";
+
         await Page.GetByPlaceholder("First name").FillAsync("Dusan");
         await Page.GetByPlaceholder("Last name").FillAsync("Maksimovic");
-        await Page.GetByPlaceholder("Username").FillAsync("dusan123");
-        await Page.GetByPlaceholder("Email address").FillAsync("dusan@example.com");
+        await Page.GetByPlaceholder("Username").FillAsync(_uniqueUsername);
+        await Page.GetByPlaceholder("Email address").FillAsync(_uniqueEmail);
         await Page.GetByPlaceholder("Phone number").FillAsync("+381612345678");
 
         var dateInput = Page.Locator("input[type='date']");
