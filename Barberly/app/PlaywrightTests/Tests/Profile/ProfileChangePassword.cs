@@ -6,60 +6,12 @@ namespace PlaywrightTests.Tests.Profile;
 
 [Parallelizable(ParallelScope.Self)]
 [TestFixture]
-public class ProfileChangePasswordTests : PageTest
+public class ProfileChangePasswordTests : BaseProfileTest
 {
-    private const string ApiUrl = "https://localhost:5174";
-
     [SetUp]
     public async Task SetUp()
     {
-        await Context.AddCookiesAsync(
-            new[]
-            {
-                new Cookie
-                {
-                    Name = "jwt",
-                    Value = "mock-jwt-token-value",
-                    Url = ApiUrl,
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteAttribute.Strict,
-                },
-            }
-        );
-
-        var mockUser = new
-        {
-            id = "123",
-            userName = "dusan",
-            email = "dusan@gmail.com",
-            firstName = "Dusan",
-            lastName = "Maksimovic",
-            phoneNumber = "+381601234567",
-            role = "Barber",
-        };
-
-        await Page.RouteAsync(
-            "**/api/**",
-            async route =>
-            {
-                if (route.Request.Method == "GET")
-                {
-                    await route.FulfillAsync(
-                        new RouteFulfillOptions
-                        {
-                            Status = 200,
-                            ContentType = "application/json",
-                            Body = JsonSerializer.Serialize(mockUser),
-                        }
-                    );
-                }
-                else
-                {
-                    await route.ContinueAsync();
-                }
-            }
-        );
+        await LoginAsync("username", "#Sifra123");
     }
 
     [Test]
@@ -75,68 +27,22 @@ public class ProfileChangePasswordTests : PageTest
     [Test]
     public async Task ChangePassword_ShouldShowErrorToast_WhenVerifyPasswordFails()
     {
-        await Page.RouteAsync(
-            "**/api/**",
-            async route =>
-            {
-                if (route.Request.Method == "POST")
-                {
-                    await route.FulfillAsync(
-                        new RouteFulfillOptions
-                        {
-                            Status = 400,
-                            ContentType = "application/json",
-                            Body = JsonSerializer.Serialize(
-                                new { message = "Incorrect current password!" }
-                            ),
-                        }
-                    );
-                }
-                else
-                {
-                    await route.FallbackAsync();
-                }
-            }
-        );
-
         await Page.GotoAsync($"{ApiUrl}/profile#security");
 
         await Page.GetByPlaceholder("Enter your current password to verify identity")
             .FillAsync("WrongPass123!");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Verify Password" }).ClickAsync();
 
-        await Expect(Page.GetByText("Incorrect current password!")).ToBeVisibleAsync();
+        await Expect(Page.GetByText("Incorrect password")).ToBeVisibleAsync();
     }
 
     [Test]
     public async Task ChangePassword_ShouldMoveToStep2_WhenVerifyPasswordSucceeds()
     {
-        await Page.RouteAsync(
-            "**/api/**",
-            async route =>
-            {
-                if (route.Request.Method == "POST")
-                {
-                    await route.FulfillAsync(
-                        new RouteFulfillOptions
-                        {
-                            Status = 200,
-                            ContentType = "application/json",
-                            Body = JsonSerializer.Serialize(new { success = true }),
-                        }
-                    );
-                }
-                else
-                {
-                    await route.FallbackAsync();
-                }
-            }
-        );
-
         await Page.GotoAsync($"{ApiUrl}/profile#security");
 
         await Page.GetByPlaceholder("Enter your current password to verify identity")
-            .FillAsync("OldPassword123!");
+            .FillAsync("#Sifra123");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Verify Password" }).ClickAsync();
 
         await Expect(Page.GetByText("Identity verified! Enter your new password."))
@@ -144,6 +50,8 @@ public class ProfileChangePasswordTests : PageTest
         await Expect(Page.GetByText("New Password", new() { Exact = true })).ToBeVisibleAsync();
         await Expect(Page.GetByText("Confirm New Password", new() { Exact = true }))
             .ToBeVisibleAsync();
+
+        await Page.GotoAsync($"{ApiUrl}/profile");
     }
 
     [Test]
@@ -155,6 +63,8 @@ public class ProfileChangePasswordTests : PageTest
         await Page.GetByRole(AriaRole.Button, new() { Name = "Update Password" }).ClickAsync();
 
         await Expect(Page.GetByText("Password must be at least 8 characters.")).ToBeVisibleAsync();
+
+        await Page.GotoAsync($"{ApiUrl}/profile");
     }
 
     [Test]
@@ -168,6 +78,8 @@ public class ProfileChangePasswordTests : PageTest
         await Page.GetByRole(AriaRole.Button, new() { Name = "Update Password" }).ClickAsync();
 
         await Expect(Page.GetByText("Passwords do not match")).ToBeVisibleAsync();
+
+        await Page.GotoAsync($"{ApiUrl}/profile");
     }
 
     [Test]
@@ -175,13 +87,15 @@ public class ProfileChangePasswordTests : PageTest
     {
         await Helper_NavigateToStep2Async();
 
-        await Page.GetByPlaceholder("e.g., ••••••••••••").FillAsync("OldPassword123!");
-        await Page.GetByPlaceholder("Repeat your new password").FillAsync("OldPassword123!");
+        await Page.GetByPlaceholder("e.g., ••••••••••••").FillAsync("#Sifra123");
+        await Page.GetByPlaceholder("Repeat your new password").FillAsync("#Sifra123");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Update Password" }).ClickAsync();
 
         await Expect(Page.GetByText("New password cannot be the same as the old password!"))
             .ToBeVisibleAsync();
+
+        await Page.GotoAsync($"{ApiUrl}/profile");
     }
 
     [Test]
@@ -195,38 +109,14 @@ public class ProfileChangePasswordTests : PageTest
             .ToBeVisibleAsync();
         await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Verify Password" }))
             .ToBeVisibleAsync();
+
+        await Page.GotoAsync($"{ApiUrl}/profile");
     }
 
     [Test]
     public async Task ChangePassword_ShouldSubmitSuccessfully_WhenDataIsValid()
     {
-        await Page.RouteAsync(
-            "**/api/**",
-            async route =>
-            {
-                if (route.Request.Method == "POST" || route.Request.Method == "PUT")
-                {
-                    await route.FulfillAsync(
-                        new RouteFulfillOptions
-                        {
-                            Status = 200,
-                            ContentType = "application/json",
-                            Body = JsonSerializer.Serialize(new { success = true }),
-                        }
-                    );
-                }
-                else
-                {
-                    await route.FallbackAsync();
-                }
-            }
-        );
-
-        await Page.GotoAsync($"{ApiUrl}/profile#security");
-
-        await Page.GetByPlaceholder("Enter your current password to verify identity")
-            .FillAsync("OldPassword123!");
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Verify Password" }).ClickAsync();
+        await Helper_NavigateToStep2Async();
 
         await Page.GetByPlaceholder("e.g., ••••••••••••").FillAsync("NewPassword123!");
         await Page.GetByPlaceholder("Repeat your new password").FillAsync("NewPassword123!");
@@ -236,38 +126,38 @@ public class ProfileChangePasswordTests : PageTest
         await Expect(Page.GetByText("Password changed successfully!")).ToBeVisibleAsync();
         await Expect(Page.GetByPlaceholder("Enter your current password to verify identity"))
             .ToBeVisibleAsync();
-    }
-
-    private async Task Helper_NavigateToStep2Async()
-    {
-        await Page.RouteAsync(
-            "**/api/**",
-            async route =>
-            {
-                if (route.Request.Method == "POST")
-                {
-                    await route.FulfillAsync(
-                        new RouteFulfillOptions
-                        {
-                            Status = 200,
-                            ContentType = "application/json",
-                            Body = JsonSerializer.Serialize(new { success = true }),
-                        }
-                    );
-                }
-                else
-                {
-                    await route.FallbackAsync();
-                }
-            }
-        );
 
         await Page.GotoAsync($"{ApiUrl}/profile#security");
 
         await Page.GetByPlaceholder("Enter your current password to verify identity")
-            .FillAsync("OldPassword123!");
+            .FillAsync("NewPassword123!");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Verify Password" }).ClickAsync();
 
         await Page.GetByPlaceholder("e.g., ••••••••••••").WaitForAsync();
+        await Page.GetByPlaceholder("e.g., ••••••••••••").FillAsync("#Sifra123");
+        await Page.GetByPlaceholder("Repeat your new password").FillAsync("#Sifra123");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Update Password" }).ClickAsync();
+
+        await Expect(Page.GetByText("Password changed successfully!")).ToBeVisibleAsync();
+
+        await Page.GotoAsync($"{ApiUrl}/profile");
+    }
+
+    private async Task Helper_NavigateToStep2Async()
+    {
+        await Page.GotoAsync($"{ApiUrl}/profile#security");
+
+        await Page.GetByPlaceholder("Enter your current password to verify identity")
+            .FillAsync("#Sifra123");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Verify Password" }).ClickAsync();
+
+        await Page.GetByPlaceholder("e.g., ••••••••••••").WaitForAsync();
+    }
+
+    [TearDown]
+    public async Task TearDown()
+    {
+        await LogoutAsync();
     }
 }

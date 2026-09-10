@@ -6,82 +6,35 @@ namespace PlaywrightTests.Tests.Profile;
 
 [Parallelizable(ParallelScope.Self)]
 [TestFixture]
-public class ProfileInfoTests : PageTest
+public class ProfileInfoTests : BaseProfileTest
 {
-    private const string ApiUrl = "https://localhost:5174";
-
-    [SetUp]
-    public async Task SetUp()
-    {
-        await Context.AddCookiesAsync([
-            new Cookie
-            {
-                Name = "jwt",
-                Value = "mock-jwt-token-value",
-                Url = ApiUrl,
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteAttribute.Strict,
-            },
-        ]);
-
-        var mockUser = new
-        {
-            id = "123",
-            userName = "dusan",
-            email = "dusan@gmail.com",
-            firstName = "Dusan",
-            lastName = "Maksimovic",
-            phoneNumber = "+381601234567",
-            birthDate = "2000-01-01",
-            salonId = "salon-1",
-            role = "Barber",
-        };
-
-        await Page.RouteAsync(
-            "**/api/**",
-            async route =>
-            {
-                if (route.Request.Method == "GET")
-                {
-                    await route.FulfillAsync(
-                        new RouteFulfillOptions
-                        {
-                            Status = 200,
-                            ContentType = "application/json",
-                            Body = JsonSerializer.Serialize(mockUser),
-                        }
-                    );
-                }
-                else
-                {
-                    await route.ContinueAsync();
-                }
-            }
-        );
-    }
-
-    [Test]
+    [Test, Order(1)]
     public async Task ProfileInfo_ShouldRenderDisabledInputs_Initially()
     {
+        await LoginAsync("username", "#Sifra123");
+
         await Page.GotoAsync($"{ApiUrl}/profile#info");
 
         var nameInput = Page.Locator("input[name='name']");
         var emailInput = Page.Locator("input[name='email']");
         var editButton = Page.GetByRole(AriaRole.Button, new() { Name = "Edit Profile" });
 
-        await Expect(nameInput).ToHaveValueAsync("Dusan");
+        await Expect(nameInput).ToHaveValueAsync("Name");
         await Expect(nameInput).ToBeDisabledAsync();
 
-        await Expect(emailInput).ToHaveValueAsync("dusan@gmail.com");
+        await Expect(emailInput).ToHaveValueAsync("username@email.com");
         await Expect(emailInput).ToBeDisabledAsync();
 
         await Expect(editButton).ToBeVisibleAsync();
+
+        await LogoutAsync();
     }
 
-    [Test]
+    [Test, Order(2)]
     public async Task ProfileInfo_ShouldEnableInputs_WhenEditButtonClicked()
     {
+        await LoginAsync("username", "#Sifra123");
+
         await Page.GotoAsync($"{ApiUrl}/profile#info");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Edit Profile" }).ClickAsync();
@@ -93,11 +46,15 @@ public class ProfileInfoTests : PageTest
         await Expect(nameInput).ToBeEnabledAsync();
         await Expect(saveButton).ToBeVisibleAsync();
         await Expect(cancelButton).ToBeVisibleAsync();
+
+        await LogoutAsync();
     }
 
-    [Test]
+    [Test, Order(3)]
     public async Task ProfileInfo_ShouldShowValidationErrors_WhenInputsAreInvalid()
     {
+        await LoginAsync("username", "#Sifra123");
+
         await Page.GotoAsync($"{ApiUrl}/profile#info");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Edit Profile" }).ClickAsync();
@@ -111,71 +68,44 @@ public class ProfileInfoTests : PageTest
         await Expect(Page.GetByText("Invalid email")).ToBeVisibleAsync();
         await Expect(Page.GetByText("Username must be at least 3 characters")).ToBeVisibleAsync();
         await Expect(Page.GetByText("Invalid phone number (format: +381...)")).ToBeVisibleAsync();
+
+        await LogoutAsync();
     }
 
-    [Test]
+    [Test, Order(4)]
     public async Task ProfileInfo_ShouldResetFormAndDisableInputs_WhenCancelClicked()
     {
+        await LoginAsync("username", "#Sifra123");
+
         await Page.GotoAsync($"{ApiUrl}/profile#info");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Edit Profile" }).ClickAsync();
 
         var firstNameInput = Page.Locator("input[name='name']");
-        await firstNameInput.FillAsync("NovoIme");
+        await firstNameInput.FillAsync("NameUpdated");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Cancel" }).ClickAsync();
 
-        await Expect(firstNameInput).ToHaveValueAsync("Dusan");
+        await Expect(firstNameInput).ToHaveValueAsync("Name");
         await Expect(firstNameInput).ToBeDisabledAsync();
         await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Edit Profile" }))
             .ToBeVisibleAsync();
+
+        await LogoutAsync();
     }
 
-    [Test]
+    [Test, Order(5)]
     public async Task ProfileInfo_ShouldSubmitFormSuccessfully_WhenDataIsValid()
     {
-        await Page.RouteAsync(
-            "**/api/**",
-            async route =>
-            {
-                if (route.Request.Method == "PUT")
-                {
-                    await route.FulfillAsync(
-                        new RouteFulfillOptions
-                        {
-                            Status = 200,
-                            ContentType = "application/json",
-                            Body = JsonSerializer.Serialize(
-                                new
-                                {
-                                    id = "123",
-                                    userName = "dusan_updated",
-                                    email = "dusan_updated@gmail.com",
-                                    firstName = "DusanUpdated",
-                                    lastName = "Maksimovic",
-                                    phoneNumber = "+381601234567",
-                                    birthDate = "2000-01-01",
-                                    salonId = "salon-1",
-                                    role = "Barber",
-                                }
-                            ),
-                        }
-                    );
-                }
-                else
-                {
-                    await route.FallbackAsync();
-                }
-            }
-        );
+        await LoginAsync("username", "#Sifra123");
 
         await Page.GotoAsync($"{ApiUrl}/profile#info");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Edit Profile" }).ClickAsync();
 
-        await Page.Locator("input[name='name']").FillAsync("DusanUpdated");
-        await Page.Locator("input[name='username']").FillAsync("dusan_updated");
-        await Page.Locator("input[name='email']").FillAsync("dusan_updated@gmail.com");
+        await Page.Locator("input[name='name']").FillAsync("NameUpdated");
+        await Page.Locator("input[name='username']").FillAsync("username_updated");
+        await Page.Locator("input[name='email']").FillAsync("username_updated@gmail.com");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Save Changes" }).ClickAsync();
 
@@ -183,41 +113,35 @@ public class ProfileInfoTests : PageTest
         await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Edit Profile" }))
             .ToBeVisibleAsync();
         await Expect(Page.Locator("input[name='name']")).ToBeDisabledAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Edit Profile" }).ClickAsync();
+
+        await Page.Locator("input[name='name']").FillAsync("Name");
+        await Page.Locator("input[name='username']").FillAsync("username");
+        await Page.Locator("input[name='email']").FillAsync("username@email.com");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save Changes" }).ClickAsync();
+
+        await Expect(Page.GetByText("Profile updated successfully!").Nth(1)).ToBeVisibleAsync();
+
+        await LogoutAsync();
     }
 
-    [Test]
+    [Test, Order(6)]
     public async Task ProfileInfo_ShouldShowErrorToast_WhenApiFails()
     {
-        await Page.RouteAsync(
-            "**/api/**",
-            async route =>
-            {
-                if (route.Request.Method == "PUT")
-                {
-                    await route.FulfillAsync(
-                        new RouteFulfillOptions
-                        {
-                            Status = 400,
-                            ContentType = "application/json",
-                            Body = JsonSerializer.Serialize(
-                                new { message = "Username already taken!" }
-                            ),
-                        }
-                    );
-                }
-                else
-                {
-                    await route.FallbackAsync();
-                }
-            }
-        );
+        await LoginAsync("username", "#Sifra123");
 
         await Page.GotoAsync($"{ApiUrl}/profile#info");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Edit Profile" }).ClickAsync();
 
+        await Page.Locator("input[name='username']").FillAsync("username1");
+
         await Page.GetByRole(AriaRole.Button, new() { Name = "Save Changes" }).ClickAsync();
 
-        await Expect(Page.GetByText("Username already taken!")).ToBeVisibleAsync();
+        await Expect(Page.GetByText("Username already exists")).ToBeVisibleAsync();
+
+        await LogoutAsync();
     }
 }
