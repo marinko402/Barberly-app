@@ -50,9 +50,8 @@ public class BarberControllerTests
         _context.Dispose();
     }
 
-    ////////////                 CREATE                      ////////////////////////////
-    ///
-    ///
+    // CREATE
+
     [Test]
     public async Task CreateBarber_ShouldReturnOk_WhenDataIsValid()
     {
@@ -244,9 +243,8 @@ public class BarberControllerTests
         );
     }
 
-    ////////////                 UPDATE                      ////////////////////////////
-    ///
-    ///
+    // UPDATE
+
     [Test]
     public async Task UpdateBarber_ShouldUpdateBarber_WhenDataIsValid()
     {
@@ -342,9 +340,8 @@ public class BarberControllerTests
         Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
     }
 
-    ////////////                 DELETE                      ////////////////////////////
-    ///
-    ///
+    // DELETE
+
     [Test]
     public async Task DeleteBarber_ShouldReturnNoContent_WhenUserDeletesOwnAccount()
     {
@@ -407,7 +404,7 @@ public class BarberControllerTests
         _userManagerMock.Verify(x => x.DeleteAsync(It.IsAny<Barber>()), Times.Never);
     }
 
-    //                    POMOCNE FUNKCIJE
+    // Helper
 
     private void SetLoggedInUser(string userId)
     {

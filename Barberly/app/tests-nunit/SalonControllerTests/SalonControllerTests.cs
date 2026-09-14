@@ -29,9 +29,7 @@ public class SalonControllerTests
         _context.Dispose();
     }
 
-    // =========================================================
     // GET ALL SALONS
-    // =========================================================
 
     [Test]
     public async Task GetAllSalons_ShouldReturnEmptyList_WhenThereAreNoSalons()
@@ -92,9 +90,7 @@ public class SalonControllerTests
         Assert.That(result.Value[0].city, Is.EqualTo("Belgrade"));
     }
 
-    // =========================================================
     // GET SALON BY ID
-    // =========================================================
 
     [Test]
     public async Task GetSalonById_ShouldReturnSalon_WhenSalonExists()
@@ -146,9 +142,7 @@ public class SalonControllerTests
         Assert.That(result.Value.city, Is.EqualTo("Nis"));
     }
 
-    // =========================================================
     // CREATE SALON
-    // =========================================================
 
     [Test]
     public async Task CreateSalon_ShouldReturnBadRequest_WhenOwnerIsNull()
@@ -228,9 +222,7 @@ public class SalonControllerTests
         Assert.That(salonInDb.city, Is.EqualTo("Nis"));
     }
 
-    // =========================================================
     // UPDATE SALON
-    // =========================================================
 
     [Test]
     public async Task UpdateSalon_ShouldReturnNotFound_WhenSalonDoesNotExist()
@@ -308,9 +300,7 @@ public class SalonControllerTests
         Assert.That(updatedSalon.city, Is.EqualTo("Belgrade"));
     }
 
-    // =========================================================
     // DELETE SALON
-    // =========================================================
 
     [Test]
     public async Task DeleteSalon_ShouldReturnNotFound_WhenSalonDoesNotExist()
@@ -364,9 +354,7 @@ public class SalonControllerTests
         Assert.That(deletedSalon, Is.Null);
     }
 
-    // =========================================================
     // ADD BARBER TO SALON
-    // =========================================================
 
     [Test]
     public async Task AddBarberToSalon_ShouldReturnNotFound_WhenBarberDoesNotExist()
@@ -435,9 +423,7 @@ public class SalonControllerTests
         Assert.That(barberInDb.SalonId, Is.EqualTo(salonId));
     }
 
-    // =========================================================
     // REMOVE BARBER FROM SALON
-    // =========================================================
 
     [Test]
     public async Task RemoveBarberFromSalon_ShouldReturnNotFound_WhenSalonDoesNotExist()
@@ -496,9 +482,7 @@ public class SalonControllerTests
         Assert.That(result, Is.TypeOf<NotFoundObjectResult>());
     }
 
-    // =========================================================
     // GET SALONS COUNT
-    // =========================================================
 
     [Test]
     public async Task GetSalonsCount_ShouldReturnZero_WhenThereAreNoSalons()
@@ -552,9 +536,7 @@ public class SalonControllerTests
         Assert.That(finalOk!.Value, Is.EqualTo(1));
     }
 
-    // =========================================================
     // GET TOP SALONS
-    // =========================================================
 
     [Test]
     public async Task GetTopSalons_ShouldReturnOk()

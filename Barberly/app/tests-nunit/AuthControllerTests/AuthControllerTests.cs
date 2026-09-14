@@ -54,9 +54,7 @@ public class AuthControllerTests
         };
     }
 
-    // =========================================================
     // REGISTER
-    // =========================================================
 
     [Test]
     public async Task Register_ShouldReturnOk_WhenDataIsValid()
@@ -132,9 +130,7 @@ public class AuthControllerTests
         Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
     }
 
-    // =========================================================
     // LOGIN
-    // =========================================================
 
     [Test]
     public async Task Login_ShouldReturnOk_WhenCredentialsAreValid()
@@ -196,9 +192,7 @@ public class AuthControllerTests
         Assert.That(result, Is.TypeOf<UnauthorizedObjectResult>());
     }
 
-    // =========================================================
     // LOGOUT
-    // =========================================================
 
     [Test]
     public void Logout_ShouldReturnOk()
@@ -228,9 +222,7 @@ public class AuthControllerTests
         Assert.That(result, Is.TypeOf<OkObjectResult>());
     }
 
-    // =========================================================
     // GET CURRENT USER
-    // =========================================================
 
     [Test]
     public async Task GetCurrentUser_ShouldReturnOk_WhenUserExists()
@@ -279,9 +271,7 @@ public class AuthControllerTests
         Assert.That(result.Result, Is.TypeOf<NotFoundObjectResult>());
     }
 
-    // =========================================================
     // GET USER DATA
-    // =========================================================
 
     [Test]
     public async Task GetUserData_ShouldReturnOk_WhenUserExists()
@@ -321,9 +311,7 @@ public class AuthControllerTests
         Assert.That(result.Result, Is.TypeOf<NotFoundObjectResult>());
     }
 
-    // =========================================================
     // UPDATE USER
-    // =========================================================
 
     [Test]
     public async Task UpdateUser_ShouldReturnOk_WhenDataIsValid()
@@ -421,9 +409,7 @@ public class AuthControllerTests
         Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
     }
 
-    // =========================================================
     // CHECK PASSWORD
-    // =========================================================
 
     [Test]
     public async Task CheckPassword_ShouldReturnOk_WhenPasswordIsCorrect()
@@ -479,9 +465,7 @@ public class AuthControllerTests
         Assert.That(result, Is.TypeOf<NotFoundObjectResult>());
     }
 
-    // =========================================================
     // CHANGE PASSWORD
-    // =========================================================
 
     [Test]
     public async Task ChangePassword_ShouldReturnOk_WhenPasswordChangeSucceeds()
@@ -558,9 +542,7 @@ public class AuthControllerTests
         Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
     }
 
-    // =========================================================
     // GET BY USERNAME
-    // =========================================================
 
     [Test]
     public async Task GetByUsername_ShouldReturnOk_WhenUserExists()

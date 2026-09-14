@@ -31,9 +31,7 @@ public class TimeslotControllerTests
         _context.Dispose();
     }
 
-    // ---------------------------------------------------------
-    // Helper metode
-    // ---------------------------------------------------------
+    // Helper
 
     private Barber CreateBarber(string? id = null)
     {
@@ -79,9 +77,7 @@ public class TimeslotControllerTests
         };
     }
 
-    // =========================================================
-    // GetAllTimeslots
-    // =========================================================
+    // GET ALL TIMESLOTS
 
     [Test]
     public async Task GetAllTimeslots_ShouldReturnAllTimeslots()
@@ -131,9 +127,7 @@ public class TimeslotControllerTests
         Assert.That(result.Value!.Any(x => !x.isBooked), Is.True);
     }
 
-    // =========================================================
-    // GetAllFreeTimeslots
-    // =========================================================
+    // GET ALL FREE TIMESLOTS
 
     [Test]
     public async Task GetAllFreeTimeslots_ShouldReturnOnlyFreeTimeslots()
@@ -182,9 +176,7 @@ public class TimeslotControllerTests
         Assert.That(result.Value, Is.Empty);
     }
 
-    // =========================================================
-    // CreateTimeslot
-    // =========================================================
+    // CREATE TIMESLOT
 
     [Test]
     public async Task CreateTimeslot_WhenBarberDoesNotExist_ShouldReturnBadRequest()
@@ -251,8 +243,6 @@ public class TimeslotControllerTests
             duration = 60,
             barberId = barber.Id,
 
-            // Čak i ako klijent pošalje true,
-            // kontroler mora da napravi slot kao free.
             isBooked = true,
         };
 
@@ -308,9 +298,7 @@ public class TimeslotControllerTests
         Assert.That(badRequest!.Value, Is.EqualTo("The timeslot overlaps with an existing one."));
     }
 
-    // =========================================================
-    // UpdateTimeslot
-    // =========================================================
+    // UPDATE TIMESLOT
 
     [Test]
     public async Task UpdateTimeslot_WhenTimeslotDoesNotExist_ShouldReturnNotFound()
@@ -431,9 +419,7 @@ public class TimeslotControllerTests
         Assert.That(badRequest!.Value, Is.EqualTo("Barber not found."));
     }
 
-    // =========================================================
-    // DeleteTimeslot
-    // =========================================================
+    // DELETE TIMESLOT
 
     [Test]
     public async Task DeleteTimeslot_WhenTimeslotDoesNotExist_ShouldReturnNotFound()
@@ -495,9 +481,7 @@ public class TimeslotControllerTests
         Assert.That(deleted, Is.Null);
     }
 
-    // =========================================================
-    // GetBarberDailySchedule
-    // =========================================================
+    // GET BARBER DAILY SCHEDULE
 
     [Test]
     public async Task GetBarberDailySchedule_ShouldReturnOnlyTimeslotsForBarberAndDate()
@@ -512,10 +496,8 @@ public class TimeslotControllerTests
 
         var ts2 = CreateTimeslot(barber, salon, date, new TimeOnly(12, 0));
 
-        // Drugi barber
         var ts3 = CreateTimeslot(otherBarber, salon, date, new TimeOnly(11, 0));
 
-        // Isti barber, drugi datum
         var ts4 = CreateTimeslot(barber, salon, new DateOnly(2026, 9, 11), new TimeOnly(13, 0));
 
         _context.Salons.Add(salon);
@@ -619,9 +601,7 @@ public class TimeslotControllerTests
         Assert.That(customerPhone, Is.EqualTo("0641234567"));
     }
 
-    // =========================================================
-    // CancelBooking
-    // =========================================================
+    // CANCEL BOOKING
 
     [Test]
     public async Task CancelBooking_WhenTimeslotDoesNotExist_ShouldReturnNotFound()
