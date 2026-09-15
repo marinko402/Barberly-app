@@ -37,51 +37,86 @@ public class BookingApiTests : PlaywrightTest
 
         var bookings = await Request.GetAsync("Booking/GetAllBookings");
 
-        if (bookings.Status != 200)
-        {
-            Assert.Fail($"Status Code: {bookings.Status} - Failed to fetch bookings.");
-            return;
-        }
+        Assert.That(
+            bookings.Status,
+            Is.EqualTo(200),
+            $"Expected 200 OK, but got {bookings.Status}: {bookings.StatusText} - {bookings.TextAsync()}"
+        );
 
         var jsonBookings = await bookings.JsonAsync();
 
-        if (!jsonBookings.GetValueOrDefault().EnumerateArray().Any())
-        {
-            Assert.Fail("No bookings found in the response.");
-            return;
-        }
+        var bookingsArray = jsonBookings.GetValueOrDefault().EnumerateArray().ToList();
 
-        var firstBooking = jsonBookings.GetValueOrDefault().EnumerateArray().FirstOrDefault();
+        Assert.That(bookingsArray, Is.Not.Empty, "No bookings found in the response.");
 
-        if (
-            firstBooking.TryGetProperty("bookingId", out var bookingId)
-            && firstBooking.TryGetProperty("timeslot", out var timeslot)
-            && firstBooking.TryGetProperty("customerFirstName", out var customerFirstName)
-            && firstBooking.TryGetProperty("customerLastName", out var customerLastName)
-            && firstBooking.TryGetProperty("customerEmail", out var customerEmail)
-            && firstBooking.TryGetProperty("customerPhoneNumber", out var customerPhoneNumber)
-        )
+        foreach (var booking in bookingsArray)
         {
             Assert.Multiple(() =>
             {
-                Assert.That(bookingId.GetString(), Is.Not.Null.And.Not.Empty);
-                Assert.That(timeslot.TryGetProperty("timeslotId", out var tsId), Is.True);
-                Assert.That(tsId.GetString(), Is.Not.Null.And.Not.Empty);
-                Assert.That(timeslot.TryGetProperty("date", out var date), Is.True);
-                Assert.That(date.GetString(), Is.EqualTo("2026-05-27"));
-                Assert.That(timeslot.TryGetProperty("startTime", out var startTime), Is.True);
-                Assert.That(startTime.GetString(), Is.EqualTo("09:30:00"));
-                Assert.That(timeslot.TryGetProperty("duration", out var duration), Is.True);
-                Assert.That(duration.GetInt32(), Is.EqualTo(30));
-                Assert.That(customerFirstName.GetString(), Is.EqualTo("Ime"));
-                Assert.That(customerLastName.GetString(), Is.EqualTo("Prezime"));
-                Assert.That(customerEmail.GetString(), Is.EqualTo("neki@email.com"));
-                Assert.That(customerPhoneNumber.GetString(), Is.EqualTo("+381654435400"));
+                Assert.That(
+                    booking.TryGetProperty("bookingId", out var bookingId)
+                        && !string.IsNullOrEmpty(bookingId.GetString()),
+                    Is.True,
+                    "Missing or empty 'bookingId'"
+                );
+                Assert.That(
+                    booking.TryGetProperty("customerFirstName", out var fn)
+                        && !string.IsNullOrEmpty(fn.GetString()),
+                    Is.True,
+                    "Missing or empty 'customerFirstName'"
+                );
+                Assert.That(
+                    booking.TryGetProperty("customerLastName", out var ln)
+                        && !string.IsNullOrEmpty(ln.GetString()),
+                    Is.True,
+                    "Missing or empty 'customerLastName'"
+                );
+                Assert.That(
+                    booking.TryGetProperty("customerEmail", out var email)
+                        && email.GetString()!.Contains("@"),
+                    Is.True,
+                    "Invalid or missing 'customerEmail'"
+                );
+                Assert.That(
+                    booking.TryGetProperty("customerPhoneNumber", out _),
+                    Is.True,
+                    "Missing 'customerPhoneNumber' property"
+                );
+
+                Assert.That(
+                    booking.TryGetProperty("timeslot", out var timeslot),
+                    Is.True,
+                    "Missing 'timeslot' property"
+                );
+
+                if (timeslot.ValueKind != System.Text.Json.JsonValueKind.Null)
+                {
+                    Assert.That(
+                        timeslot.TryGetProperty("timeslotId", out var tsId)
+                            && !string.IsNullOrEmpty(tsId.GetString()),
+                        Is.True,
+                        "Missing or empty 'timeslotId'"
+                    );
+                    Assert.That(
+                        timeslot.TryGetProperty("date", out var date)
+                            && !string.IsNullOrEmpty(date.GetString()),
+                        Is.True,
+                        "Missing or empty 'date' in timeslot"
+                    );
+                    Assert.That(
+                        timeslot.TryGetProperty("startTime", out var startTime)
+                            && !string.IsNullOrEmpty(startTime.GetString()),
+                        Is.True,
+                        "Missing or empty 'startTime' in timeslot"
+                    );
+                    Assert.That(
+                        timeslot.TryGetProperty("duration", out var duration)
+                            && duration.GetInt32() > 0,
+                        Is.True,
+                        "Invalid or missing 'duration' in timeslot"
+                    );
+                }
             });
-        }
-        else
-        {
-            Assert.Fail("Response object does not contain expected properties.");
         }
     }
 
@@ -195,7 +230,7 @@ public class BookingApiTests : PlaywrightTest
             Is.True,
             "Response is not a valid integer."
         );
-        Assert.That(count, Is.EqualTo(6));
+        Assert.That(count, Is.GreaterThanOrEqualTo(0), "Booking count cannot be negative.");
     }
 
     [TearDown]

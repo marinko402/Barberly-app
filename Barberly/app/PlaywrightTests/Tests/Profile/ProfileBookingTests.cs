@@ -21,16 +21,16 @@ public class ProfileBookingsTests : BaseProfileTest
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Today's Schedule" }))
             .ToBeVisibleAsync();
         await Expect(Page.GetByText("Total Slots")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("2", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(Page.GetByText("3", new() { Exact = true })).ToBeVisibleAsync();
 
-        await Expect(Page.GetByText("09:00")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("Duration: 30 min")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("Available for booking")).ToBeVisibleAsync();
+        await Expect(Page.GetByText("10:00")).ToBeVisibleAsync();
+        await Expect(Page.GetByText("Duration: 45 min").Nth(0)).ToBeVisibleAsync();
+        await Expect(Page.GetByText("Available for booking").Nth(0)).ToBeVisibleAsync();
         await Expect(Page.Locator("span").GetByText("Open", new() { Exact = true }).Nth(0))
             .ToBeVisibleAsync();
 
-        await Expect(Page.GetByText("10:00")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("Duration: 45 min")).ToBeVisibleAsync();
+        await Expect(Page.GetByText("11:00")).ToBeVisibleAsync();
+        await Expect(Page.GetByText("Duration: 45 min").Nth(1)).ToBeVisibleAsync();
         await Expect(Page.GetByText("Petar Petrovic")).ToBeVisibleAsync();
         await Expect(Page.GetByText("petar@email.com")).ToBeVisibleAsync();
         await Expect(Page.GetByText("+381123456789")).ToBeVisibleAsync();
@@ -59,9 +59,9 @@ public class ProfileBookingsTests : BaseProfileTest
             .ToBeVisibleAsync();
         await Expect(Page.GetByText("Total Slots")).ToBeVisibleAsync();
 
-        await Expect(Page.GetByText("09:00")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("Available for booking")).ToBeVisibleAsync();
         await Expect(Page.GetByText("10:00")).ToBeVisibleAsync();
+        await Expect(Page.GetByText("Available for booking").Nth(0)).ToBeVisibleAsync();
+        await Expect(Page.GetByText("11:00")).ToBeVisibleAsync();
         await Expect(Page.GetByText("Petar Petrovic")).ToBeVisibleAsync();
     }
 

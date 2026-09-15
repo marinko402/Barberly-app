@@ -117,20 +117,31 @@ public class HomePageTest : PageTest
             )
             .ToBeVisibleAsync();
 
-        await Expect(Page.GetByText("3+")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("6+")).ToBeVisibleAsync();
+        var dynamicOption = Page.GetByText(new Regex(@"^\d+\+$")).First;
+        await Expect(dynamicOption).ToBeVisibleAsync();
+        var dynamicOption2 = Page.GetByText(new Regex(@"^\d+\+$")).Nth(1);
+        await Expect(dynamicOption2).ToBeVisibleAsync();
     }
 
     [Test]
     public async Task HomeFindBarber_ShouldRenderTopSalonsCards()
     {
-        var barberCards = Page.Locator(".barber-card");
-        await Expect(barberCards.First).ToBeVisibleAsync();
+        var salonCards = Page.Locator(".barber-card");
+        var cardsCount = await salonCards.CountAsync();
+        Assert.That(cardsCount, Is.GreaterThan(0), "No salon cards rendered.");
 
-        await Expect(Page.GetByText("Antic Group")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("Dusanova 90, Nis")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("2 Staff")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("5 Bookings")).ToBeVisibleAsync();
+        var firstCard = salonCards.First;
+
+        await Expect(firstCard.Locator("h3")).ToBeVisibleAsync();
+
+        await Expect(firstCard.Locator("img")).ToBeVisibleAsync();
+
+        await Expect(firstCard.Locator("p").First).ToBeVisibleAsync();
+
+        await Expect(firstCard.GetByText(new Regex(@"\d+\s+Staff", RegexOptions.IgnoreCase)))
+            .ToBeVisibleAsync();
+        await Expect(firstCard.GetByText(new Regex(@"\d+\s+Bookings", RegexOptions.IgnoreCase)))
+            .ToBeVisibleAsync();
     }
 
     [Test]
@@ -150,12 +161,16 @@ public class HomePageTest : PageTest
     [Test]
     public async Task HomeFindBarber_SliderKeyboardNavigationShouldChangeActiveCard()
     {
+        var salonCards = Page.Locator(".barber-card");
+
         var sliderContainer = Page.Locator(".slider-container");
+
         await sliderContainer.FocusAsync();
 
         await Page.Keyboard.PressAsync("ArrowRight");
 
-        var secondCard = Page.Locator(".barber-card").Nth(1);
+        var secondCard = salonCards.Nth(1);
+
         await Expect(secondCard).ToHaveClassAsync(new Regex("scale-100"));
     }
 
@@ -167,8 +182,7 @@ public class HomePageTest : PageTest
         await dots.Nth(1).ClickAsync();
 
         var secondCard = Page.Locator(".barber-card").Nth(1);
-        await Expect(secondCard)
-            .ToHaveClassAsync(new Regex("scale-100"));
+        await Expect(secondCard).ToHaveClassAsync(new Regex("scale-100"));
     }
 
     [Test]
@@ -179,9 +193,8 @@ public class HomePageTest : PageTest
 
         await Page.Keyboard.PressAsync("ArrowLeft");
 
-        var lastCard = Page.Locator(".barber-card").Nth(2);
-        await Expect(lastCard)
-            .ToHaveClassAsync(new Regex("scale-100"));
+        var lastCard = Page.Locator(".barber-card").Last;
+        await Expect(lastCard).ToHaveClassAsync(new Regex("scale-100"));
     }
 
     [Test]

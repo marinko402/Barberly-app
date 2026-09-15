@@ -27,12 +27,12 @@ public class BarbersTests : PageTest
             .ToBeVisibleAsync();
         await Expect(Page.GetByText("Dusanova 90")).ToBeVisibleAsync();
         await Expect(Page.GetByText("Nis").Nth(1)).ToBeVisibleAsync();
-        await Expect(Page.GetByText("2 Staff")).ToBeVisibleAsync();
+        await Expect(Page.GetByText("2 Staff").Nth(1)).ToBeVisibleAsync();
 
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Kvanto" }))
             .ToBeVisibleAsync();
         await Expect(Page.GetByText("Dusanova 15")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("Beograd")).ToBeVisibleAsync();
+        await Expect(Page.GetByText("Beograd").Nth(0)).ToBeVisibleAsync();
         await Expect(Page.GetByText("1 Staff").Nth(0)).ToBeVisibleAsync();
     }
 

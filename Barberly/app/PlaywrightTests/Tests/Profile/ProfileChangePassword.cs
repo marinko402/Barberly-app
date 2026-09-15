@@ -4,7 +4,7 @@ using Microsoft.Playwright.NUnit;
 
 namespace PlaywrightTests.Tests.Profile;
 
-[Parallelizable(ParallelScope.Self)]
+// [Parallelizable(ParallelScope.Self)]
 [TestFixture]
 public class ProfileChangePasswordTests : BaseProfileTest
 {

@@ -190,24 +190,39 @@ public class SalonController : ControllerBase
     [HttpGet("GetTopSalons")]
     public async Task<IActionResult> GetTopSalons()
     {
-        var topSalons = await context
-            .Salons.Select(s => new
+        var salons = await context
+            .Salons.AsNoTracking()
+            .Select(s => new
             {
                 s.salonId,
                 s.name,
                 s.address,
                 s.city,
                 StaffCount = s.barbers != null ? s.barbers.Count : 0,
-                TotalBookings = context.Bookings.Count(b =>
-                    b.timeslot != null
-                    && b.timeslot.salon != null
-                    && b.timeslot.salon.salonId == s.salonId
-                ),
+            })
+            .ToListAsync();
+
+        var bookingCounts = await context
+            .Bookings.AsNoTracking()
+            .Where(b => b.timeslot != null && b.timeslot.salon != null)
+            .GroupBy(b => b.timeslot!.salon!.salonId)
+            .Select(g => new { SalonId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.SalonId, x => x.Count);
+
+        var result = salons
+            .Select(s => new
+            {
+                s.salonId,
+                s.name,
+                s.address,
+                s.city,
+                s.StaffCount,
+                TotalBookings = bookingCounts.TryGetValue(s.salonId, out var count) ? count : 0,
             })
             .OrderByDescending(x => x.TotalBookings)
             .Take(6)
-            .ToListAsync();
+            .ToList();
 
-        return Ok(topSalons);
+        return Ok(result);
     }
 }

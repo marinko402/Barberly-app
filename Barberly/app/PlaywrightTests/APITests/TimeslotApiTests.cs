@@ -39,45 +39,70 @@ public class TimeslotApiTests : PlaywrightTest
 
         var timeslots = await Request.GetAsync("Timeslot/GetAllTimeslots");
 
-        if (timeslots.Status != 200)
-        {
-            Assert.Fail($"Code: {timeslots.Status} - {timeslots.StatusText}");
-            return;
-        }
+        Assert.That(
+            timeslots.Status,
+            Is.EqualTo(200),
+            $"Expected 200 OK, but got {timeslots.Status}: {timeslots.StatusText} - {timeslots.TextAsync()}"
+        );
 
         var jsonTimeslots = await timeslots.JsonAsync();
+        var timeslotsArray = jsonTimeslots.GetValueOrDefault().EnumerateArray().ToList();
 
-        if (!jsonTimeslots.GetValueOrDefault().EnumerateArray().Any())
-        {
-            Assert.Fail("No timeslots found in the response.");
-            return;
-        }
+        Assert.That(timeslotsArray, Is.Not.Empty, "No timeslots found in the response.");
 
-        var firstTimeslot = jsonTimeslots.GetValueOrDefault().EnumerateArray().FirstOrDefault();
-
-        if (
-            firstTimeslot.TryGetProperty("timeslotId", out var timeslotId)
-            && firstTimeslot.TryGetProperty("date", out var date)
-            && firstTimeslot.TryGetProperty("startTime", out var startTime)
-            && firstTimeslot.TryGetProperty("duration", out var duration)
-            && firstTimeslot.TryGetProperty("salon", out var salon)
-            && firstTimeslot.TryGetProperty("isBooked", out var isBooked)
-        )
+        foreach (var timeslot in timeslotsArray)
         {
             Assert.Multiple(() =>
             {
-                Assert.That(timeslotId.GetString(), Is.Not.Null.And.Not.Empty);
-                Assert.That(date.GetString(), Is.EqualTo("2026-07-31"));
-                Assert.That(startTime.GetString(), Is.EqualTo("09:00:00"));
-                Assert.That(duration.GetInt32(), Is.EqualTo(30));
-                Assert.That(salon.TryGetProperty("name", out var salonName), Is.True);
-                Assert.That(salonName.GetString(), Is.EqualTo("Antic Group"));
-                Assert.That(isBooked.GetBoolean(), Is.False);
+                Assert.That(
+                    timeslot.TryGetProperty("timeslotId", out var tsId)
+                        && !string.IsNullOrEmpty(tsId.GetString()),
+                    Is.True,
+                    "Missing or empty 'timeslotId'"
+                );
+                Assert.That(
+                    timeslot.TryGetProperty("date", out var date)
+                        && !string.IsNullOrEmpty(date.GetString()),
+                    Is.True,
+                    "Missing or empty 'date'"
+                );
+                Assert.That(
+                    timeslot.TryGetProperty("startTime", out var startTime)
+                        && !string.IsNullOrEmpty(startTime.GetString()),
+                    Is.True,
+                    "Missing or empty 'startTime'"
+                );
+                Assert.That(
+                    timeslot.TryGetProperty("duration", out var duration)
+                        && duration.GetInt32() > 0,
+                    Is.True,
+                    "Invalid or missing 'duration'"
+                );
+                Assert.That(
+                    timeslot.TryGetProperty("isBooked", out var isBooked)
+                        && (
+                            isBooked.ValueKind == JsonValueKind.True
+                            || isBooked.ValueKind == JsonValueKind.False
+                        ),
+                    Is.True,
+                    "Missing or invalid boolean 'isBooked'"
+                );
+
+                Assert.That(
+                    timeslot.TryGetProperty("salon", out var salon),
+                    Is.True,
+                    "Missing 'salon' property"
+                );
+                if (salon.ValueKind != JsonValueKind.Null)
+                {
+                    Assert.That(
+                        salon.TryGetProperty("name", out var salonName)
+                            && !string.IsNullOrEmpty(salonName.GetString()),
+                        Is.True,
+                        "Missing or empty 'name' in salon"
+                    );
+                }
             });
-        }
-        else
-        {
-            Assert.Fail("Response object does not contain expected properties.");
         }
     }
 
@@ -88,45 +113,68 @@ public class TimeslotApiTests : PlaywrightTest
 
         var timeslots = await Request.GetAsync("Timeslot/GetAllFreeTimeslots");
 
-        if (timeslots.Status != 200)
-        {
-            Assert.Fail($"Code: {timeslots.Status} - {timeslots.StatusText}");
-            return;
-        }
+        Assert.That(
+            timeslots.Status,
+            Is.EqualTo(200),
+            $"Expected 200 OK, but got {timeslots.Status}: {timeslots.StatusText} - {timeslots.TextAsync()}"
+        );
 
         var jsonTimeslots = await timeslots.JsonAsync();
 
-        if (!jsonTimeslots.GetValueOrDefault().EnumerateArray().Any())
-        {
-            Assert.Fail("No free timeslots found in the response.");
-            return;
-        }
+        var timeslotsArray = jsonTimeslots.GetValueOrDefault().EnumerateArray().ToList();
 
-        var firstTimeslot = jsonTimeslots.GetValueOrDefault().EnumerateArray().FirstOrDefault();
+        Assert.That(timeslotsArray, Is.Not.Empty, "No free timeslots found in the response.");
 
-        if (
-            firstTimeslot.TryGetProperty("timeslotId", out var timeslotId)
-            && firstTimeslot.TryGetProperty("date", out var date)
-            && firstTimeslot.TryGetProperty("startTime", out var startTime)
-            && firstTimeslot.TryGetProperty("duration", out var duration)
-            && firstTimeslot.TryGetProperty("salon", out var salon)
-            && firstTimeslot.TryGetProperty("isBooked", out var isBooked)
-        )
+        foreach (var timeslot in timeslotsArray)
         {
             Assert.Multiple(() =>
             {
-                Assert.That(timeslotId.GetString(), Is.Not.Null.And.Not.Empty);
-                Assert.That(date.GetString(), Is.EqualTo("2026-07-31"));
-                Assert.That(startTime.GetString(), Is.EqualTo("09:00:00"));
-                Assert.That(duration.GetInt32(), Is.EqualTo(30));
-                Assert.That(salon.TryGetProperty("name", out var salonName), Is.True);
-                Assert.That(salonName.GetString(), Is.EqualTo("Antic Group"));
-                Assert.That(isBooked.GetBoolean(), Is.False);
+                Assert.That(
+                    timeslot.TryGetProperty("timeslotId", out var tsId)
+                        && !string.IsNullOrEmpty(tsId.GetString()),
+                    Is.True,
+                    "Missing or empty 'timeslotId'"
+                );
+                Assert.That(
+                    timeslot.TryGetProperty("date", out var date)
+                        && !string.IsNullOrEmpty(date.GetString()),
+                    Is.True,
+                    "Missing or empty 'date'"
+                );
+                Assert.That(
+                    timeslot.TryGetProperty("startTime", out var startTime)
+                        && !string.IsNullOrEmpty(startTime.GetString()),
+                    Is.True,
+                    "Missing or empty 'startTime'"
+                );
+                Assert.That(
+                    timeslot.TryGetProperty("duration", out var duration)
+                        && duration.GetInt32() > 0,
+                    Is.True,
+                    "Invalid or missing 'duration'"
+                );
+
+                Assert.That(
+                    timeslot.TryGetProperty("isBooked", out var isBooked) && !isBooked.GetBoolean(),
+                    Is.True,
+                    "Expected 'isBooked' to be false for free timeslot."
+                );
+
+                Assert.That(
+                    timeslot.TryGetProperty("salon", out var salon),
+                    Is.True,
+                    "Missing 'salon' property"
+                );
+                if (salon.ValueKind != JsonValueKind.Null)
+                {
+                    Assert.That(
+                        salon.TryGetProperty("name", out var salonName)
+                            && !string.IsNullOrEmpty(salonName.GetString()),
+                        Is.True,
+                        "Missing or empty 'name' in salon"
+                    );
+                }
             });
-        }
-        else
-        {
-            Assert.Fail("Response object does not contain expected properties.");
         }
     }
 

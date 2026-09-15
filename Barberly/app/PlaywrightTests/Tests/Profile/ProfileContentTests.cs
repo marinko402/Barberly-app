@@ -36,7 +36,7 @@ public class ProfileContentTests : BaseProfileTest
     [Test]
     public async Task ProfileContent_ShouldShowLockedState_WhenBarberHasNoSalon_OnTimeslots()
     {
-        await LoginAsync("user_50d04554", "Password123!");
+        await LoginAsync("user_cc8d9e38", "Password123!");
 
         await Page.GotoAsync($"{ApiUrl}/profile#timeslots");
 
@@ -57,7 +57,7 @@ public class ProfileContentTests : BaseProfileTest
     [Test]
     public async Task ProfileContent_ShouldShowLockedState_WhenBarberHasNoSalon_OnBookings()
     {
-        await LoginAsync("user_50d04554", "Password123!");
+        await LoginAsync("user_cc8d9e38", "Password123!");
 
         await Page.GotoAsync($"{ApiUrl}/profile#bookings");
 
@@ -75,7 +75,7 @@ public class ProfileContentTests : BaseProfileTest
     [Test]
     public async Task ProfileContent_ShouldNavigateToSalonTab_WhenClickingSetUpSalonButton()
     {
-        await LoginAsync("user_50d04554", "Password123!");
+        await LoginAsync("user_cc8d9e38", "Password123!");
         await Page.GotoAsync($"{ApiUrl}/profile#timeslots");
 
         await Page.GetByRole(AriaRole.Link, new() { Name = "Set up My Salon" }).ClickAsync();

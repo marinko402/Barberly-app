@@ -34,7 +34,7 @@ public class ProfileSidebarTests : BaseProfileTest
     {
         await Page.SetViewportSizeAsync(1440, 900);
 
-        await LoginAsync("user_50d04554", "Password123!");
+        await LoginAsync("user_cc8d9e38", "Password123!");
 
         await Page.GotoAsync($"{ApiUrl}/profile");
 

@@ -10,7 +10,7 @@ public class ProfileMySalonTests : BaseProfileTest
     [SetUp]
     public async Task SetUp()
     {
-        await LoginAsync("user_50d04554", "Password123!");
+        await LoginAsync("user_cc8d9e38", "Password123!");
     }
 
     [Test, Order(1)]
@@ -40,7 +40,7 @@ public class ProfileMySalonTests : BaseProfileTest
     {
         await Page.GotoAsync($"{ApiUrl}/profile#salon");
 
-        await Page.GetByPlaceholder("e.g., The Gentleman's Club").FillAsync("Gentleman Barber");
+        await Page.GetByPlaceholder("e.g., The Gentleman's Club").FillAsync("Gentleman Club");
         await Page.GetByPlaceholder("e.g., Knez Mihailova 21").FillAsync("Knez Mihailova 10");
         await Page.GetByPlaceholder("e.g., Belgrade").FillAsync("Belgrade");
 
@@ -55,14 +55,14 @@ public class ProfileMySalonTests : BaseProfileTest
         await Page.GotoAsync($"{ApiUrl}/profile#salon");
 
         await Expect(Page.GetByPlaceholder("e.g., The Gentleman's Club"))
-            .ToHaveValueAsync("Gentleman Barber");
+            .ToHaveValueAsync("Gentleman Club");
         await Expect(Page.GetByPlaceholder("e.g., Knez Mihailova 21"))
             .ToHaveValueAsync("Knez Mihailova 10");
         await Expect(Page.GetByPlaceholder("e.g., Belgrade")).ToHaveValueAsync("Belgrade");
 
         await Expect(Page.GetByText("Active Team (1)")).ToBeVisibleAsync();
         await Expect(Page.GetByText("Dusan Maksimovic").Nth(2)).ToBeVisibleAsync();
-        await Expect(Page.GetByText("@user_50d04554").Nth(1)).ToBeVisibleAsync();
+        await Expect(Page.GetByText("@user_cc8d9e38").Nth(1)).ToBeVisibleAsync();
     }
 
     [Test, Order(5)]
@@ -83,7 +83,7 @@ public class ProfileMySalonTests : BaseProfileTest
     {
         await Page.GotoAsync($"{ApiUrl}/profile#salon");
 
-        await Page.GetByPlaceholder("e.g., john.barber").FillAsync("username4");
+        await Page.GetByPlaceholder("e.g., john.barber").FillAsync("user_849f8429");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Add Barber" }).ClickAsync();
 
         await Expect(Page.GetByText("Barber successfully added to salon!")).ToBeVisibleAsync();
@@ -119,7 +119,7 @@ public class ProfileMySalonTests : BaseProfileTest
         await Page.SetViewportSizeAsync(375, 667);
         await Page.GotoAsync($"{ApiUrl}/profile#salon");
 
-        await Page.GetByPlaceholder("e.g., The Gentleman's Club").FillAsync("Gentleman Barber");
+        await Page.GetByPlaceholder("e.g., The Gentleman's Club").FillAsync("Gentleman Club");
         await Page.GetByPlaceholder("e.g., Knez Mihailova 21").FillAsync("Knez Mihailova 10");
         await Page.GetByPlaceholder("e.g., Belgrade").FillAsync("Belgrade");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Launch Salon" }).ClickAsync();
@@ -133,9 +133,21 @@ public class ProfileMySalonTests : BaseProfileTest
         await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Edit Salon" }))
             .ToBeVisibleAsync();
 
-        await Page.GetByPlaceholder("e.g., john.barber").FillAsync("username4");
+        await Page.GetByPlaceholder("e.g., john.barber").FillAsync("user_849f8429");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Add Barber" }).ClickAsync();
         await Expect(Page.GetByText("Barber successfully added to salon!")).ToBeVisibleAsync();
+
+        await Page.GetByTitle("Remove from salon").ClickAsync();
+
+        await Expect(Page.GetByText("Remove Team Member")).ToBeVisibleAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Remove", Exact = true }).ClickAsync();
+
+        await Expect(Page.GetByText("Barber successfully removed from salon.")).ToBeVisibleAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Delete Salon" }).ClickAsync();
+
+        await Expect(Page.GetByText("Salon successfully deleted!")).ToBeVisibleAsync();
     }
 
     [TearDown]

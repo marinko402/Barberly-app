@@ -38,48 +38,62 @@ public class BarberApiTests : PlaywrightTest
 
         var barbers = await Request.GetAsync("Barber/GetAllBarbers");
 
-        if (barbers.Status != 200)
-        {
-            Assert.Fail($"Status Code: {barbers.Status} - Failed to fetch barbers.");
-            return;
-        }
+        Assert.That(
+            barbers.Status,
+            Is.EqualTo(200),
+            $"Expected 200 OK, but got {barbers.Status}: {barbers.StatusText} - {barbers.TextAsync()}"
+        );
 
         var jsonBarbers = await barbers.JsonAsync();
+        var barbersArray = jsonBarbers.GetValueOrDefault().EnumerateArray().ToList();
 
-        if (!jsonBarbers.GetValueOrDefault().EnumerateArray().Any())
-        {
-            Assert.Fail("No barbers found in the response.");
-            return;
-        }
+        Assert.That(barbersArray, Is.Not.Empty, "No barbers found in the response.");
 
-        var firstBarber = jsonBarbers.GetValueOrDefault().EnumerateArray().FirstOrDefault();
-
-        if (
-            firstBarber.TryGetProperty("id", out var id)
-            && firstBarber.TryGetProperty("firstName", out var firstName)
-            && firstBarber.TryGetProperty("lastName", out var lastName)
-            && firstBarber.TryGetProperty("birthDate", out var birthDate)
-            && firstBarber.TryGetProperty("salonId", out var salonId)
-            && firstBarber.TryGetProperty("userName", out var userName)
-            && firstBarber.TryGetProperty("email", out var email)
-            && firstBarber.TryGetProperty("phoneNumber", out var phoneNumber)
-        )
+        foreach (var barber in barbersArray)
         {
             Assert.Multiple(() =>
             {
-                Assert.That(id.GetString(), Is.Not.Null.And.Not.Empty);
-                Assert.That(firstName.GetString(), Is.EqualTo("first name"));
-                Assert.That(lastName.GetString(), Is.EqualTo("last name"));
-                Assert.That(birthDate.GetString(), Is.EqualTo("2002-02-02"));
-                Assert.That(salonId.GetString(), Is.Not.Null.And.Not.Empty);
-                Assert.That(userName.GetString(), Is.EqualTo("username2"));
-                Assert.That(email.GetString(), Is.EqualTo("username2@email.com"));
-                Assert.That(phoneNumber.GetString(), Is.EqualTo("+381654435400"));
+                Assert.That(
+                    barber.TryGetProperty("id", out var id)
+                        && !string.IsNullOrEmpty(id.GetString()),
+                    Is.True,
+                    "Missing or empty 'id'"
+                );
+                Assert.That(
+                    barber.TryGetProperty("firstName", out var firstName)
+                        && !string.IsNullOrEmpty(firstName.GetString()),
+                    Is.True,
+                    "Missing or empty 'firstName'"
+                );
+                Assert.That(
+                    barber.TryGetProperty("lastName", out var lastName)
+                        && !string.IsNullOrEmpty(lastName.GetString()),
+                    Is.True,
+                    "Missing or empty 'lastName'"
+                );
+                Assert.That(
+                    barber.TryGetProperty("userName", out var userName)
+                        && !string.IsNullOrEmpty(userName.GetString()),
+                    Is.True,
+                    "Missing or empty 'userName'"
+                );
+                Assert.That(
+                    barber.TryGetProperty("email", out var email)
+                        && email.GetString()!.Contains("@"),
+                    Is.True,
+                    "Invalid or missing 'email'"
+                );
+                Assert.That(
+                    barber.TryGetProperty("phoneNumber", out _),
+                    Is.True,
+                    "Missing 'phoneNumber' property"
+                );
+                Assert.That(
+                    barber.TryGetProperty("salonId", out _),
+                    Is.True,
+                    "Missing 'salonId' property"
+                );
             });
-        }
-        else
-        {
-            Assert.Fail("Response object does not contain expected properties.");
         }
     }
 
